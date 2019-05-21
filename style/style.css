@@ -57,6 +57,7 @@ body {overscroll-behavior: none;  margin: 0; padding: 0;}
 }
 a { color:blue; text-decoration: none; }
 main {
+	user-select: none;
 	background: #FFF;
 	box-sizing: border-box;
 	display: flex;
