@@ -49,7 +49,7 @@ const loadComponent = (() => {
 							@media (min-width:750px) { li { width: 33.3333%; } }
 							@media (min-width:1000px) { li { width: 25%; } }
 							@media (min-width:1250px) { li { width: 20%; } }
-							a { margin: 2px; display: block; border: 1px #999 solid; padding: 5px; border-radius: 5px; line-height: 1.5; }
+							a { text-decoration: none; margin: 2px; display: block; border: 1px #999 solid; padding: 5px; border-radius: 5px; line-height: 1.5; }
 							a:hover { background: #DDD; }
 							a * { overflow: hidden; text-overflow: ellipsis; white-space:nowrap; }
 							h2 { margin: 0; padding: 0; color:cornflowerblue; font-size: 16px; }
