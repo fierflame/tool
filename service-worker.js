@@ -7,7 +7,7 @@ const baseItem = {
 }
 const itemVersion = {
 	...baseItem,
-	'component/qrcode.js': 1,
+	'component/qrcode.js': 2,
 };
 const cacheName = 'xutool-item';
 const serviceRoot = self.location.href.replace(/\/*([^/]*)(?:[#?].*)?$/, '/');

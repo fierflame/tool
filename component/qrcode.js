@@ -7,7 +7,7 @@ export default class Qrcode extends HTMLElement {
 		this._shadow = shadow;
 		shadow.innerHTML = `
 <style>
-	:host { display: flex; --width: 120px; }
+	:host { display: flex; --width: 120px; position: relative; }
 	textarea{resize: none;s}
 	* { box-sizing: border-box; margin: 0; }
 	#selector { height: 40px; white-space:nowrap; background: #51AEFF; overflow: auto;}
@@ -27,7 +27,8 @@ export default class Qrcode extends HTMLElement {
 	@media (min-width:600px) { :host { --width: 180px; } }
 	@media (min-width:800px) { :host { --width: 240px; } }
 	@media (min-width:1000px) { :host { --width: 300px; } }
-
+	#showLayer { display: none; position: absolute; background: rgba(0,0,0,0.5); top: 0; left: 0; right: 0; bottom: 0; }
+	#showLayer img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; max-width: 90%; max-height: 90%; }
 </style>
 <div class="main">
 	<div id="selector"><span data-type-id="text">文本</span><span data-type-id="url">网址</span><span data-type-id="wifi">WIFI</span></div>
@@ -71,7 +72,9 @@ export default class Qrcode extends HTMLElement {
 	</select></label>
 	<button id="show">查看二维码</button>
 	<button id="download">下载二维码</button>
-</div>`;
+</div>
+<div id="showLayer"></div>
+`;
 		this._canvas = shadow.querySelector('canvas')
 
 		Array.from(shadow.querySelectorAll('form'))
@@ -106,6 +109,11 @@ export default class Qrcode extends HTMLElement {
 
 		shadow.querySelector('#show').addEventListener('click', e => this.show())
 		shadow.querySelector('#download').addEventListener('click', e => this.download())
+		shadow.querySelector('#showLayer').addEventListener('click', function (e){
+			if (e.path[0] !== this) { return; }
+			this.innerHTML = '';
+			this.style.display = 'none';
+		})
 
 		Array.from(shadow.querySelectorAll('span[data-type-id]'))
 		.forEach(it => it.addEventListener('click', (event) => {this.type = it.dataset.typeId;}));
@@ -172,8 +180,11 @@ export default class Qrcode extends HTMLElement {
 	}
 	show() {
 		if(!this._map) { return alert(`请先生成二维码`); }
-		const uri = this.getUri();
-		window.open(uri);
+		const showLayer = this._shadow.querySelector('#showLayer');
+		const image = new Image();
+		image.src = this.getUri();
+		showLayer.appendChild(image);
+		showLayer.style.display = 'block';
 	}
 	download() {
 		if(!this._map) { return alert(`请先生成二维码`); }
