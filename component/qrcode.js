@@ -69,7 +69,8 @@ export default class Qrcode extends HTMLElement {
 		<option value="image/jpeg">jpg</option>
 		<option value="image/svg+xml">svg</option>
 	</select></label>
-	<button id="download">下载图片</button>
+	<button id="show">查看二维码</button>
+	<button id="download">下载二维码</button>
 </div>`;
 		this._canvas = shadow.querySelector('canvas')
 
@@ -103,6 +104,7 @@ export default class Qrcode extends HTMLElement {
 		this._opt = opt;
 
 
+		shadow.querySelector('#show').addEventListener('click', e => this.show())
 		shadow.querySelector('#download').addEventListener('click', e => this.download())
 
 		Array.from(shadow.querySelectorAll('span[data-type-id]'))
@@ -168,30 +170,43 @@ export default class Qrcode extends HTMLElement {
 			}
 		}
 	}
+	show() {
+		if(!this._map) { return alert(`请先生成二维码`); }
+		const uri = this.getUri();
+		window.open(uri);
+	}
 	download() {
-		if(!this._map) { return; }
-		const mimes = {
-			'image/png': '二维码.png',
-			'image/jpeg': '二维码.jpg',
-			'image/svg+xml': '二维码.svg',
-		}
-		const {mime} = this._opt;
+		if(!this._map) { return alert(`请先生成二维码`); }
 		const a = document.createElement('a');
-		a.href = this.getUrl();
-		
-		a.download = mimes[mime] || '二维码.jpg';
+		a.href = this.getUri();
+		a.download = '二维码';
 		return a.click();
 	}
-	getUrl() {
-		if(!this._map) { return; }
-		const {mime} = this._opt;
+	getUri() {
+		if(!this._map) { return alert(`请先生成二维码`); }
+		let {mime} = this._opt;
+		const data = [];
 		if (mime === 'image/svg+xml') {
-			return URL.createObjectURL(new Blob([this.svg()],{type:'image/svg+xml'}));
+			data.push(this.svg());
+		} else {
+			const uri = this._canvas.toDataURL(mime);
+			let base;
+			[mime, base] = uri.replace(/^data:/, '').split(/\s*;\s*base64\s*,\s*/);
+			const str = atob(base);
+			const sliceSize = 512;
+			for (let offset = 0; offset < str.length; offset += sliceSize) {
+				const chars = str.slice(offset, offset + sliceSize);
+				const ua = new Uint8Array(chars.length);
+				for (let i = 0; i < chars.length; i++) {
+					ua[i] = chars.charCodeAt(i);
+				}
+				data.push(ua);
+			}
 		}
-		return this._canvas.toDataURL(mime);
+		return URL.createObjectURL(new Blob(data, {type: mime}));
 	}
 	svg() {
-		if(!this._map) { return; }
+		if(!this._map) { return alert(`请先生成二维码`); }
 		let map = this._map;
 		const path = [];
 		const length = Math.sqrt(map.length);
