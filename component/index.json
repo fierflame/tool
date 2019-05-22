@@ -1,3 +1,4 @@
 [
-	{"id": "base64", "title": "Base64 编码转换", "explain": "可以进行 base64 编码或解码的工具"}
+	{"id": "base64", "title": "Base64 编码转换", "explain": "可以进行 base64 编码或解码"},
+	{"id": "qrcode", "title": "Qrcode 二维码生成器", "explain": "可以生成文本、网址等的二维码"}
 ]

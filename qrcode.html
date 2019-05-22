@@ -7,11 +7,9 @@
 	<meta name="renderer" content="webkit"/>
 	<meta name="force-rendering" content="webkit"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
-	<title>王晨旭的工具箱</title>
+	<title>Qrcode 二维码生成器 | 王晨旭的工具箱</title>
 	<link rel="stylesheet" href="./style/style.css">
 	<script src="./script/script.js"></script>
-	<style>
-</style>
 </head>
 <body>
 	<header>
@@ -24,19 +22,17 @@
 		<div id="tool-bar">
 			<a class="set-top btn" href="#main">#</a>
 			<a class="go-home btn" href="./" draggable="true">首页</a>
-			<div id="title">王晨旭的工具箱</div>
+			<div id="title">Qrcode 二维码生成器</div>
 			<a class="fullscreen btn" href="#main" onclick="switchFullscreen(this.parentNode.parentNode)">全屏</a>
 		</div>
-		<ul class="main" id="home-index">
-			<li><a href="./base64.html#main" title="Base64 编码转换">
-				<h2>Base64 编码转换</h2>
-				<p>可以进行 base64 编码或解码</p>
-			</a></li>
-			<li><a href="./qrcode.html#main" title="Qrcode 二维码生成器">
-				<h2>Qrcode 二维码生成器</h2>
-				<p>可以生成文本、网址等的二维码</p>
-			</a></li>
-		</ul>
+		<xutool-qrcode class="main">
+			<div class="loadding-box">
+				<div class="loadding"></div>
+				<p>如果长时间未完成加载</p>
+				<p>可能是浏览器版本太低</p>
+				<p>请升级浏览器后再试</p>
+			</div>
+		</xutool-qrcode>
 	</main>
 	<footer>
 		<div>
@@ -45,5 +41,6 @@
 			<script src="//s19.cnzz.com/stat.php?id=1274150741&show=pic"></script>
 		</div>
 	</footer>
+	<script>setComponent('qrcode');</script>
 </body>
 </html>
