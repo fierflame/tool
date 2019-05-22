@@ -56,7 +56,7 @@ const loadComponent = (() => {
 							p { color: #999; font-size: 12px; margin: 0; padding: 0; }
 						</style>
 						<ul id="home-index">
-							${list.map(({id, title, explain}) => `<li><a href="./${id}.html#main" title="${title}" data-id="${id}"><h2>${title}</h2><p>${explain}</p></a></li>`)}
+							${list.map(({id, title, explain}) => `<li><a href="./${id}.html#main" title="${title}" data-id="${id}"><h2>${title}</h2><p>${explain}</p></a></li>`).join('')}
 						</ul>`
 					Array.from(shadow.querySelectorAll('a')).forEach(a => {
 						const {dataset:{id}, href, title} = a;
