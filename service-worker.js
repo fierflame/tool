@@ -15,18 +15,18 @@ function getPath(url) {
 	return url.substr(serviceRoot.length).replace(/[#?].*$/, '');
 }
 function getPageId(path) {
-	path = /^([a-z0-9\-]*)(?:\.html)?$/.exec(path);
-	if (path) { return path[1] || 'index'; }
+	let info = /^([a-z0-9\-]*)(?:\.html)?$/.exec(path);
+	if (info) { return info[1] || 'index'; }
 }
 function getItemId(path) {
-	path = /^((?:component|util)\/[a-z0-9\-]*\.js)$/.exec(path);
-	if (path) { return path[1] || ''; }
-	path = /^(logo\/\d+\.png)$/.exec(path);
-	if (path) { return path[1] || ''; }
-	path = /^(logo\/logo\.svg)$/.exec(path);
-	if (path) { return path[1] || ''; }
-	path = /^(favicon\.ico)$/.exec(path);
-	if (path) { return path[1] || ''; }
+	let info = /^((?:component|util)\/[a-z0-9\-]*\.js)$/.exec(path);
+	if (info) { return info[1] || ''; }
+	info = /^(logo\/\d+\.png)$/.exec(path);
+	if (info) { return info[1] || ''; }
+	info = /^(logo\/logo\.svg)$/.exec(path);
+	if (info) { return info[1] || ''; }
+	info = /^(favicon\.ico)$/.exec(path);
+	if (info) { return info[1] || ''; }
 }
 
 async function putItem(id, res, version = itemVersion[id] || 0) {
