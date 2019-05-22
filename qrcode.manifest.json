@@ -1,0 +1,16 @@
+{
+	"background_color": "#0088FF",
+	"start_url": "./pwa.html?qrcode",
+	"name": "QrCode - Xu Tools",
+	"short_name": "QrCode",
+	"description": "开发者常用工具合集",
+	"display": "standalone",
+	"icons": [
+		{
+			"src": "favicon.svg",
+			"type": "image/svg+xml"
+		}
+	],
+	"lang": "zh-CN",
+	"theme_color": "#0088FF"
+}

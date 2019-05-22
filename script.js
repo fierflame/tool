@@ -39,12 +39,11 @@ const loadList = (()=>{
 		return list;
 	};
 })();
+
 const loadComponent = (() => {
 	const components = Object.create(null);
 	return async (id) => {
-		if (id in components) {
-			return components[id];
-		}
+		if (id in components) { return components[id]; }
 		if (!id || id === 'index') {
 			const getUrl = isPWA ? id => `?${id}` : id => `./${id}.html`;
 			return components[id] = loadList().then(list => class Index extends HTMLElement {
@@ -83,6 +82,7 @@ const loadComponent = (() => {
 		return components[id] = import(`./component/${id}.js`).then(({default: def}) => def)
 	}
 })();
+
 const setComponent = (() => {
 	const components = Object.create(null);
 	return async (name, id = name) => {
@@ -193,4 +193,3 @@ window.addEventListener('load', x => {
 
 	}
 });
-
