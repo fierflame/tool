@@ -1,7 +1,3 @@
-const itemVersion = {
-
-};
-
 const baseItem = {
 	'init.html': 0,
 	'xutool.html': 0,
@@ -9,8 +5,10 @@ const baseItem = {
 	'script.js': 0,
 	'style.css': 0,
 }
-
-
+const itemVersion = {
+	...baseItem,
+};
+const cacheName = 'xutool-item';
 const serviceRoot = self.location.href.replace(/\/*([^/]*)(?:[#?].*)?$/, '/');
 function getPath(url) {
 	if (url.indexOf(serviceRoot) !== 0) { return; }
@@ -31,7 +29,7 @@ function getItemId(path) {
 	if (path) { return path[1] || ''; }
 }
 
-async function putItem(id, res, cache = 'xutool-item', version = itemVersion[id] || 0) {
+async function putItem(id, res, version = itemVersion[id] || 0) {
 	const data = await res.clone().blob();
 	res = new Response(data, {
 		headers: {
@@ -40,39 +38,45 @@ async function putItem(id, res, cache = 'xutool-item', version = itemVersion[id]
 			'Content-Length': data.size,
 		}
 	})
-	cache = await caches.open(cache)
+	let cache = await caches.open(cacheName)
 	cache.put(`./${id}`, res);
 }
-async function backup(id, cache = 'xutool-item', version = itemVersion[id]) {
+async function backup(id, version = itemVersion[id]) {
 	const res = await fetch(`./${id}`);
 	if(res.status !== 200) { return res; }
-	putItem(id, res, cache, version);
+	putItem(id, res, version);
 	return res;
 }
-async function updateItem(id, oldRes, cache = 'xutool-item', version = itemVersion[id]) {
+async function updateItem(id, oldRes, version = itemVersion[id]) {
 	if (typeof version !== 'number') { return oldRes; }
 	if (oldRes && Number(oldRes.headers.get('Xu-Tools-Version') || 0) >= version) { return oldRes; }
 	try {
 		const res = await fetch(`./${id}`);
 		if(res.status !== 200) { return oldRes; }
-		putItem(id, res, cache, version);
+		putItem(id, res, version);
 		return res;
 	} catch(e) {
+		if (oldRes) { throw e; }
 		return oldRes;
 	}
 
 }
-
+function updateList() {
+	setTimeout(updateList, 6 * 60 *60 * 1000);
+	backup('./component/index.json');
+}
 
 self.addEventListener('install', function(event) {
-	event.waitUntil(caches.open('xutool-base-page')
+	caches.delete('page-1')
+	caches.delete('xutool-base-page')
+	event.waitUntil(caches.open(cacheName)
 		.then(cache => Promise.all(
 			Object.keys(baseItem)
-				.map(async k => updateItem(k, await cache.match(k), 'xutool-base-page', baseItem[k]))
-		))
+				.map(async k => updateItem(k, await cache.match(k), baseItem[k]))
+		)).then(updateList)
 	);
 });
-self.addEventListener('activate', function(event) {});
+self.addEventListener('activate', function(event) {updateList()});
 self.addEventListener('fetch', function(event) {
 	if (event.request.method !== 'GET') { return; }
 	const path = getPath(event.request.url);
@@ -91,6 +95,9 @@ self.addEventListener('fetch', function(event) {
 		return event.respondWith(caches.match('./init.html'));
 	}
 	const itemId = getItemId(path);
+	if (itemId === 'component/index.json') {
+		return event.respondWith(caches.match(`./${itemId}`).then(res => res ? res : backup(itemId)));
+	}
 	if (itemId) {
 		return event.respondWith(caches.match(`./${itemId}`).then(res => res ? updateItem(itemId, res) : backup(itemId)));
 		
