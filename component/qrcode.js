@@ -1,4 +1,4 @@
-import createQrcodeMap from './util/qrcode.js'
+import createQrcodeMap from '../util/qrcode.js'
 
 export default class Qrcode extends HTMLElement {
 	constructor() {

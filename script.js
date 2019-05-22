@@ -1,4 +1,7 @@
 const isPWA = /(?:\.\/)?pwa(?:\.html)?$/.test(location.pathname);
+const isTool = /(?:\.\/)?xutool(?:\.html)?$/.test(location.pathname);
+if (isPWA && parent !== this) { location = `./`; }
+
 // 自动切换
 function switchFullscreen(element) {
 	var fullscreenElement =
@@ -77,7 +80,7 @@ const loadComponent = (() => {
 				}
 			})
 		}
-		return components[id] = import(`../component/${id}.js`).then(({default: def}) => def)
+		return components[id] = import(`./component/${id}.js`).then(({default: def}) => def)
 	}
 })();
 const setComponent = (() => {
@@ -102,7 +105,19 @@ function showComponent(name, title) {
 		main.removeChild(component);
 	}
 }
-window.onload = x => {
+function registerServiceWorker() {
+	if (!('serviceWorker' in navigator)) { return false; }
+	return navigator.serviceWorker.register('./service-worker.js')
+		.then(function (registration) {
+			// 注册成功
+			console.log('ServiceWorker registration successful with scope: ', registration.scope);
+		}, function (err) {
+			// 注册失败 :(
+			console.log('ServiceWorker registration failed: ', err);
+	});
+}
+registerServiceWorker();
+window.addEventListener('load', x => {
 	window.addEventListener('popstate', ({state}) => {
 		if (state && state.id) {
 			showComponent(state.id, state.title);
@@ -140,4 +155,42 @@ window.onload = x => {
 			})(id, href, a.title)));
 		}
 	}
-}
+	if (isPWA) {
+		loadList().then(list => {
+			const id = location.search.substr(1);
+			const it = list.find(v => v.id === id);
+			if (!it) {
+				history.replaceState({id: 'index', title: ''}, document.title);
+				return showComponent('');
+			}
+			history.replaceState({id: 'index', title: it.title}, document.title);
+			showComponent(id, it.title);
+		});
+	} if (isTool) {
+		const id = location.search.substr(1);
+		if (!id || id === 'index' || parent === this) {
+			location = `./${id}.html`;
+		}
+		setComponent('xutool', id);
+	} else {
+		let id = location.pathname.replace(/\/([a-z0-9\-]+)(?:\.html)?$/, '$1');
+		if (!window.isBase) {
+			if (id[id.length - 1] !== '/') {
+				showComponent(id, document.getElementById('title').innerText);
+			}
+		} else {
+			loadList().then(list => {
+				if (!/^[a-z0-9\-]+$/.test(id)) { id = 'index'; }
+				const it = list.find(v => v.id === id);
+				if (!it) {
+					history.replaceState({id: 'index', title: ''}, document.title, './');
+					return showComponent('');
+				}
+				history.replaceState({id: 'index', title: it.title}, document.title);
+				return showComponent(id, it.title);
+			});
+		}
+
+	}
+});
+

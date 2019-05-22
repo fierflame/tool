@@ -1,4 +1,4 @@
-import * as base64 from './util/base64.js'
+import * as base64 from '../util/base64.js'
 
 export default class Base64 extends HTMLElement {
 	constructor() {
