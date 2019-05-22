@@ -1,42 +1,53 @@
 {
-	"background_color": "#0088FF",
+	"name": "Xu Tools 开发者工具",
+	"short_name": "Xu 工具",
 	"description": "开发者常用工具合集",
 	"display": "standalone",
+	"start_url": "./pwa.html",
+	"background_color": "#0088FF",
+	"theme_color": "#0088FF",
 	"icons": [
 		{
-			"src": "favicon.svg",
+			"src": "./logo/36.png",
 			"sizes": "36x36",
-			"type": "image/svg+xml"
+			"type": "image/png",
+			"density": "0.75"
 		},
 		{
-			"src": "favicon.svg",
+			"src": "./logo/48.png",
 			"sizes": "48x48",
-			"type": "image/svg+xml"
+			"type": "image/png",
+			"density": "1"
 		},
 		{
-			"src": "favicon.svg",
+			"src": "./logo/72.png",
 			"sizes": "72x72",
-			"type": "image/svg+xml"
+			"type": "image/png",
+			"density": "1.5"
 		},
 		{
-			"src": "favicon.svg",
+			"src": "./logo/96.png",
 			"sizes": "96x96",
-			"type": "image/svg+xml"
+			"type": "image/png",
+			"density": "2.0"
 		},
 		{
-			"src": "favicon.svg",
+			"src": "./logo/logo.svg",
+			"sizes": "128x128",
+			"type": "image/svg+xml",
+			"density": "0.75"
+		},
+		{
+			"src": "./logo/144.png",
 			"sizes": "144x144",
-			"type": "image/svg+xml"
+			"type": "image/png",
+			"density": "3.0"
 		},
 		{
-			"src": "favicon.svg",
+			"src": "./logo/192.png",
 			"sizes": "192x192",
-			"type": "image/svg+xml"
+			"type": "image/png",
+			"density": "4.0"
 		}
-	],
-	"lang": "zh-CN",
-	"name": "Xu Tools",
-	"short_name": "Xu Tools",
-	"start_url": "./pwa.html",
-	"theme_color": "#0088FF"
+	]
 }
