@@ -57,6 +57,7 @@ body {overscroll-behavior: none;  margin: 0; padding: 0;}
 }
 a { color:blue; text-decoration: none; }
 main {
+	outline: 1px;
 	user-select: none;
 	background: #FFF;
 	box-sizing: border-box;
@@ -66,7 +67,6 @@ main {
 	max-width: 1280px;
 	margin: auto;
 	flex-direction: column;
-	border: 1px solid #999;
 }
 .main {
 	flex: 1;
@@ -94,6 +94,9 @@ main {
 #tool-bar #title {
 	flex: 1;
 	border: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space:nowrap;
 }
 #tool-bar .set-top {
 	width: 30px;
@@ -153,23 +156,20 @@ main {
 #home-index a:hover {
 	background: #DDD;
 }
-#home-index h2 {
+#home-index * {
 	margin: 0;
 	padding: 0;
-	color:cornflowerblue;
-	font-size: 16px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space:nowrap;
 }
+#home-index h2 {
+	color:cornflowerblue;
+	font-size: 16px;
+}
 #home-index p {
 	color: #999;
 	font-size: 12px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space:nowrap;
-	margin: 0;
-	padding: 0;
 }
 header {
 	height: 48px;
