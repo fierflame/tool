@@ -1,3 +1,4 @@
+const isPWA = /(?:\.\/)?pwa(?:\.html)?$/.test(location.pathname);
 // 自动切换
 function switchFullscreen(element) {
 	var fullscreenElement =
@@ -28,16 +29,22 @@ function switchFullscreen(element) {
 		element.webkitRequestFullScreen();
 	}
 }
-const loadComponent = (() => {
+const loadList = (()=>{
 	let list = null;
+	return async (id) => {
+		if (!list) { list = fetch('./component/index.json').then(res => res.json()); }
+		return list;
+	};
+})();
+const loadComponent = (() => {
 	const components = Object.create(null);
 	return async (id) => {
 		if (id in components) {
 			return components[id];
 		}
 		if (!id || id === 'index') {
-			if (!list) { list = fetch('./component/index.json').then(res => res.json()); }
-			return components[id] = list.then(list => class Index extends HTMLElement {
+			const getUrl = isPWA ? id => `?${id}` : id => `./${id}.html`;
+			return components[id] = loadList().then(list => class Index extends HTMLElement {
 				constructor() {
 					super();
 					let shadow = this.attachShadow({mode:'open'});
@@ -56,7 +63,7 @@ const loadComponent = (() => {
 							p { color: #999; font-size: 12px; margin: 0; padding: 0; }
 						</style>
 						<ul id="home-index">
-							${list.map(({id, title, explain}) => `<li><a href="./${id}.html#main" title="${title}" data-id="${id}"><h2>${title}</h2><p>${explain}</p></a></li>`).join('')}
+							${list.map(({id, title, explain}) => `<li><a href="${getUrl(id)}" title="${title}" data-id="${id}"><h2>${title}</h2><p>${explain}</p></a></li>`).join('')}
 						</ul>`
 					Array.from(shadow.querySelectorAll('a')).forEach(a => {
 						const {dataset:{id}, href, title} = a;
@@ -85,7 +92,7 @@ const setComponent = (() => {
 function showComponent(name, title) {
 	setComponent(name);
 	const main = document.getElementById('main');
-	document.getElementById('title').innerText = title || '';
+	document.getElementById('title').innerText = title || '王晨旭的工具箱';
 	const components = Array.from(document.getElementsByClassName('main'));
 	const component = document.createElement(`xutool-${name}`);
 	component.innerHTML = `<div class="loadding-box"><div class="loadding"></div><p>如果长时间未完成加载</p><p>可能是浏览器版本太低</p><p>请升级浏览器后再试</p></div>`
@@ -102,8 +109,14 @@ window.onload = x => {
 		}
 	})
 	const title = document.title.replace(/\s*\|.*$/, '');
-	let id = location.pathname.replace(/\/([^/]*?)(?:\.html)$/, '$1');
-	if (id === '/') { id = 'index'; }
+	let id;
+	if (isPWA) {
+		id = location.search.substr(1);
+	} else {
+		let id = location.pathname.replace(/\/([^/]*?)(?:\.html)$/, '$1');
+		if (id === '/') { id = 'index'; }
+	}
+
 	history.replaceState({id, title}, document.title);
 	
 	for (let a of Array.from(document.getElementById('main').getElementsByTagName('a'))) {
@@ -111,7 +124,9 @@ window.onload = x => {
 		const href = a.getAttribute('href');
 		if (href[0] == '#' || !href) { continue; }
 		let id = '';
-		if (/(?:\.\/)?([a-z0-9\-]+)(\.html)?(?:[?#].*)?$/.test(href)) {
+		if (/^\?([a-z0-9]*)(?:#.*)?$/.test(href)) {
+			id = /^\?([a-z0-9]*)(?:#.*)?$/.exec(href)[1] || 'index';
+		} else if (/(?:\.\/)?([a-z0-9\-]+)(?:\.html)?(?:[?#].*)?$/.test(href)) {
 			id = /(?:\.\/)?([a-z0-9]+)(?:\.html)?(?:[?#].*)?$/.exec(href)[1];
 		} else if (href === './'){
 			id = 'index';
@@ -119,7 +134,7 @@ window.onload = x => {
 		if (id) {
 			a.addEventListener('click', (((id, href, title) => event => {
 				showComponent(id, title);
-				history.pushState({id, title},title, href);
+				history.pushState({id, title}, title, href);
 				event.preventDefault();
 				event.stopPropagation();	
 			})(id, href, a.title)));
