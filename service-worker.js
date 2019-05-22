@@ -1,5 +1,5 @@
 const baseItem = {
-	'init.html': 0,
+	'init.html': 1,
 	'xutool.html': 0,
 	'pwa.html': 0,
 	'script.js': 0,
