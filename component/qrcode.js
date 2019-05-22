@@ -10,7 +10,7 @@ export default class Qrcode extends HTMLElement {
 	:host { display: flex; --width: 120px; }
 	textarea{resize: none;s}
 	* { box-sizing: border-box; margin: 0; }
-	#selector { height: 40px; display: flex; background: #51AEFF; }
+	#selector { height: 40px; white-space:nowrap; background: #51AEFF; overflow: auto;}
 	#selector span { display: inline-block; background: #FFF; height: 30px; padding: 5px; border-radius: 5px; margin: 5px; line-height: 20px; color: #08F; }
 	#selector span.select { background: #08F; color: #FFF; }
 	form { flex: 1; display: none; overflow: auto; flex-direction: column; }
