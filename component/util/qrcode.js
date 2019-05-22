@@ -112,7 +112,6 @@ var gexp = [
 var strinbuf=[], eccbuf=[], qrframe=[], framask=[], rlens=[]; 
 // Control values - width is based on version, last 4 are from table.
 var version, width, neccblk1, neccblk2, datablkw, eccblkwid;
-var ecclevel = 2;
 // set bit to indicate cell in qrframe is immutable.  symmetric around diagonal
 function setmask(x, y)
 {
@@ -378,8 +377,10 @@ function badcheck()
 	return thisbad;
 }
 
-function genframe(instring)
+function genframe(instring, ecclevel = 2)
 {
+	strinbuf=[], eccbuf=[], qrframe=[], framask=[], rlens=[]; 
+	genpoly = [];
 	var x, y, k, t, v, i, j, m;
 
 // find the smallest version that fits the string
@@ -720,6 +721,5 @@ function str2buff(str) {
 }
 
 export default function getData(str, level) {
-	ecclevel = level || ecclevel;
-	return genframe(Array.from(new Uint8Array(str2buff(str))).map(c => String.fromCharCode(c)).join(''));
+	return genframe(Array.from(new Uint8Array(str2buff(str))).map(c => String.fromCharCode(c)).join(''), level);
 }
