@@ -1,7 +1,7 @@
 const baseItem = {
-	'init.html': 1,
+	'init.html': 2,
 	'xutool.html': 0,
-	'pwa.html': 0,
+	'pwa.html': 2,
 	'script.js': 0,
 	'style.css': 0,
 }
