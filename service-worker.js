@@ -1,14 +1,11 @@
-const baseItem = {
-	'init.html': 3,
-	'xutool.html': 3,
-	'pwa.html': 3,
-	'script.js': 3,
-	'style.css': 3,
-}
+const baseItemVersion = 4;
 const itemVersion = {
-	...baseItem,
 	'component/qrcode.js': 3,
 };
+const baseItem = [ 'init.html', 'xutool.html', 'pwa.html', 'script.js', 'style.css',];
+baseItem.forEach(it => itemVersion[id] = baseItemVersion);
+
+
 const cacheName = 'xutool-item';
 const serviceRoot = self.location.href.replace(/\/*([^/]*)(?:[#?].*)?$/, '/');
 function getPath(url) {
@@ -72,8 +69,7 @@ self.addEventListener('install', function(event) {
 	caches.delete('xutool-base-page')
 	event.waitUntil(caches.open(cacheName)
 		.then(cache => Promise.all(
-			Object.keys(baseItem)
-				.map(async k => updateItem(k, await cache.match(k), baseItem[k]))
+			baseItem.map(async k => updateItem(k, await cache.match(k), baseItem[k]))
 		)).then(updateList)
 	);
 });
