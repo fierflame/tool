@@ -166,7 +166,7 @@ window.addEventListener('load', x => {
 			history.replaceState({id: 'index', title: it.title}, document.title);
 			showComponent(id, it.title);
 		});
-	} if (isTool) {
+	} else if (isTool) {
 		const id = location.search.substr(1);
 		if (!id || id === 'index' || parent === this) {
 			location = `./${id}.html`;
