@@ -7,18 +7,21 @@ export default class Qrcode extends HTMLElement {
 		this._shadow = shadow;
 		shadow.innerHTML = `
 <style>
-	:host { display: flex; --width: 120px; position: relative; }
-	textarea{resize: none;s}
+	:host { display: flex; flex-direction: column; --width: 120px; position: relative; }
+	.main { display: flex; flex: 1;  height: calc(100% - 40px);}
+	.main > * { overflow: auto; }
+	textarea{resize: none;}
+	label { white-space:nowrap; }
 	* { box-sizing: border-box; margin: 0; }
 	#selector { height: 40px; white-space:nowrap; background: #51AEFF; overflow: auto;}
-	#selector span { display: inline-block; background: #FFF; height: 30px; padding: 5px; border-radius: 5px; margin: 5px; line-height: 20px; color: #08F; }
+	#selector span { display: inline-block; background: #FFF; height: 30px; padding: 5px; border-radius: 5px; margin: 5px 2px; line-height: 20px; color: #08F; }
 	#selector span.select { background: #08F; color: #FFF; }
-	form { flex: 1; display: none; overflow: auto; flex-direction: column; }
+	form { flex: 1; display: none; flex-direction: column; }
 	form.select { display: flex; }
 	form > * { margin: 10px auto; max-width: 800px; width: 95%; display: flex; min-height: 30px; line-height: 30px; }
 	form > button { display: inline-block; max-width: 200px; width: 100%; text-align: center; }
 	form input, form select { flex: 1; }
-	.main { flex: 1; display: flex; flex-direction: column; }
+	main { flex: 1; display: flex; flex-direction: column; }
 	#info { width: var(--width); display: flex; flex-direction: column; overflow: auto}
 	#info label { display: flex; height: 30px; line-height: 30px; font-size: 16px; }
 	#info input[type=color], #info input[type=number], #info select  { flex: 1; height: 30px; box-sizing: border-box; margin: 0; width: 60px; line-height: 30px; }
@@ -30,48 +33,74 @@ export default class Qrcode extends HTMLElement {
 	#showLayer { display: none; position: absolute; background: rgba(0,0,0,0.5); top: 0; left: 0; right: 0; bottom: 0; }
 	#showLayer img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; max-width: 90%; max-height: 90%; }
 </style>
-<div class="main">
-	<div id="selector"><span data-type-id="text">文本</span><span data-type-id="url">网址</span><span data-type-id="wifi">WIFI</span></div>
-	<form data-type-id="text">
-		<input name="type" value="text" type="hidden" />
-		<textarea name="text" rows="10"></textarea>
-		<button type="submit">生成二维码</button>
-	</form>
-	<form data-type-id="url">
-		<input name="type" value="text" type="hidden" />
-		<label>URL:<input  name="text" type="url" /></label>
-		<button type="submit">生成二维码</button>
-	</form>
-	<form data-type-id="wifi">
-		<input name="type" value="wifi" type="hidden" />
-		<label>WiFi名称:<input name="S" type="text" /></label>
-		<label>加密方式:<select name="T">
-		<option value="">不加密(无密码)/自动识别</option>
-		<option value="WPA">WPA</option>
-		<option value="WPA2">WPA2</option>
-	</select></label>
-		<label>WiFi密码:<input name="P" type="text" /></label>
-		<button type="submit">生成二维码</button>
-	</form>
+<div id="selector">
+	<span data-type-id="text">文本</span>
+	<span data-type-id="url">网址</span>
+	<span data-type-id="vcard">名片</span>
+	<span data-type-id="wifi">WIFI</span>
 </div>
-<div id="info">
-	<canvas></canvas>
-	<label>前景色<input name="color" type="color" value="#000000" /></label>
-	<label>背景色<input name="bgcolor" type="color" value="#FFFFFF"/></label>
-	<label>大　小<input name="size" type="number" min="200" max="1000" value="360" /></label>
-	<label>容　错<select name="level">
-		<option value="1">7%</option>
-		<option value="2" selected>15%</option>
-		<option value="3">25%</option>
-		<option value="4">30%</option>
-	</select></label>
-	<label>类　型<select name="mime">
-		<option value="image/png">png</option>
-		<option value="image/jpeg">jpg</option>
-		<option value="image/svg+xml">svg</option>
-	</select></label>
-	<button id="show">查看二维码</button>
-	<button id="download">下载二维码</button>
+<div class="main">
+	<main>
+		<form data-type-id="text">
+			<input name="type" value="text" type="hidden" />
+			<textarea name="text" rows="10"></textarea>
+			<button type="submit">生成二维码</button>
+		</form>
+		<form data-type-id="url">
+			<input name="type" value="text" type="hidden" />
+			<label>URL:<input  name="text" type="url" /></label>
+			<button type="submit">生成二维码</button>
+		</form>
+		<form data-type-id="vcard">
+			<input name="type" value="vcard" type="hidden" />
+			<label>个人信息:</label>
+			<label>姓名:<input name="fullname" type="text" required placeholder="姓名，必填" /></label>
+			<label>称呼:<input name="nickname" type="text" /></label>
+			<label>手机:<input name="mytel" type="tel" placeholder="个人的联系电话" /></label>
+			<label>邮箱:<input name="myemail" type="email" placeholder="个人的联系电话" /></label>
+			<label>网站:<input name="myurl" type="url" placeholder="个人网站、博客" /></label>
+			<label>地址:<input name="myadr" type="text" placeholder="家庭住址" /></label>
+			<label>工作信息:</label>
+			<label>公司:<input name="org" type="text" placeholder="公司或者所在组织名称" /></label>
+			<label>职位:<input name="worktitle" type="text" placeholder="担任的职位" /></label>
+			<label>电话:<input name="worktel" type="tel" placeholder="工作时的联系电弧" /></label>
+			<label>传真:<input name="workfax" type="tel" placeholder="工作地点的传真" /></label>
+			<label>邮箱:<input name="workemail" type="email" placeholder="工作邮箱" /></label>
+			<label>网站:<input name="workurl" type="url" placeholder="公司网站" /></label>
+			<label>地址:<input name="workadr" type="text" placeholder="工作地点" /></label>
+			<button type="submit">生成二维码</button>
+		</form>
+		<form data-type-id="wifi">
+			<input name="type" value="wifi" type="hidden" />
+			<label>WiFi名称:<input name="S" type="text" /></label>
+			<label>加密方式:<select name="T">
+				<option value="">不加密(无密码)/自动识别</option>
+				<option value="WPA">WPA</option>
+				<option value="WPA2">WPA2</option>
+			</select></label>
+			<label>WiFi密码:<input name="P" type="text" /></label>
+			<button type="submit">生成二维码</button>
+		</form>
+	</main>
+	<div id="info">
+		<canvas></canvas>
+		<label>前景色<input name="color" type="color" value="#000000" /></label>
+		<label>背景色<input name="bgcolor" type="color" value="#FFFFFF"/></label>
+		<label>大　小<input name="size" type="number" min="200" max="1000" value="360" /></label>
+		<label>容　错<select name="level">
+			<option value="1">7%</option>
+			<option value="2" selected>15%</option>
+			<option value="3">25%</option>
+			<option value="4">30%</option>
+		</select></label>
+		<label>类　型<select name="mime">
+			<option value="image/png">png</option>
+			<option value="image/jpeg">jpg</option>
+			<option value="image/svg+xml">svg</option>
+		</select></label>
+		<button id="show">查看二维码</button>
+		<button id="download">下载二维码</button>
+	</div>
 </div>
 <div id="showLayer"></div>
 `;
@@ -96,6 +125,27 @@ export default class Qrcode extends HTMLElement {
 						data = `WIFI:S:${S};${T ?`T:${T};`:''}${P ?`P:${P};`:''}`;
 						break;
 					}
+					case 'vcard': {
+						data = [
+							'BEGIN:VCARD',
+							'VERSION:3.0',
+							form.fullname.value ? `FN:${form.fullname.value}` : '',
+							form.nickname.value ? `NICKNAME:${form.nickname.value}` : '',
+							form.mytel.value ? `TEL;TYPE=CELL:${form.mytel.value}` : '',
+							form.myemail.value ? `EMAIL;TYPE=HOME:${form.myemail.value}` : '',
+							form.myurl.value ? `URL;TYPE=HOME:${form.myurl.value}` : '',
+							form.myadr.value ? `ADR;TYPE=HOME:${form.myadr.value}` : '',
+							form.org.value ? `ORG:${form.org.value}` : '',
+							form.worktitle.value ? `TITLE:${form.wor121ktitle.value}` : '',
+							form.worktel.value ? `TEL;TYPE=WORK:${form.worktel.value}` : '',
+							form.workfax.value ? `TEL;TYPE=WORK;TYPE=FAX:${form.workfax.value}` : '',
+							form.workemail.value ? `EMAIL;TYPE=WORK:${form.workemail.value}` : '',
+							form.workurl.value ? `URL;TYPE=WORK:${form.workurl.value}` : '',
+							form.workadr.value ? `ADR;TYPE=WORK:${form.workadr.value}` : '',
+							'END:VCARD',
+						].filter(Boolean).join('\n');
+					}
+					break;
 				}
 				if (!data) { return; }
 				this.create(data);
