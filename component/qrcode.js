@@ -136,7 +136,7 @@ export default class Qrcode extends HTMLElement {
 							form.myurl.value ? `URL;TYPE=HOME:${form.myurl.value}` : '',
 							form.myadr.value ? `ADR;TYPE=HOME:${form.myadr.value}` : '',
 							form.org.value ? `ORG:${form.org.value}` : '',
-							form.worktitle.value ? `TITLE:${form.wor121ktitle.value}` : '',
+							form.worktitle.value ? `TITLE:${form.worktitle.value}` : '',
 							form.worktel.value ? `TEL;TYPE=WORK:${form.worktel.value}` : '',
 							form.workfax.value ? `TEL;TYPE=WORK;TYPE=FAX:${form.workfax.value}` : '',
 							form.workemail.value ? `EMAIL;TYPE=WORK:${form.workemail.value}` : '',

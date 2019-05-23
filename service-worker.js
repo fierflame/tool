@@ -1,6 +1,6 @@
 const baseItemVersion = 4;
 const itemVersion = {
-	'component/qrcode.js': 3,
+	'component/qrcode.js': 4,
 };
 const baseItem = [ 'init.html', 'xutool.html', 'pwa.html', 'script.js', 'style.css',];
 baseItem.forEach(it => itemVersion[it] = baseItemVersion);
