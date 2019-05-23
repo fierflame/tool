@@ -1,9 +1,9 @@
 const baseItem = {
-	'init.html': 2,
-	'xutool.html': 0,
-	'pwa.html': 2,
-	'script.js': 0,
-	'style.css': 0,
+	'init.html': 3,
+	'xutool.html': 3,
+	'pwa.html': 3,
+	'script.js': 3,
+	'style.css': 3,
 }
 const itemVersion = {
 	...baseItem,
@@ -83,17 +83,17 @@ self.addEventListener('fetch', function(event) {
 	const path = getPath(event.request.url);
 	if (typeof path !== 'string') { return; }
 	if (path === 'script.js') {
-		return event.respondWith(caches.match('./script.js'));
+		return event.respondWith(caches.match('./script.js').then(res => res || backup(path)));
 	} else if (path === 'style.css') {
-		return event.respondWith(caches.match('./style.css'));
+		return event.respondWith(caches.match('./style.css').then(res => res || backup(path)));
 	}
 	const pageId = getPageId(path);
 	if (pageId === 'pwa') {
-		return event.respondWith(caches.match('./pwa.html'));
+		return event.respondWith(caches.match('./pwa.html').then(res => res || backup('pwa.html')));
 	} else if (pageId === 'xutool') {
-		return event.respondWith(caches.match('./xutool.html'));
+		return event.respondWith(caches.match('./xutool.html').then(res => res || backup('xutool.html')));
 	} else if (pageId) {
-		return event.respondWith(caches.match('./init.html'));
+		return event.respondWith(caches.match('./init.html').then(res => res || backup('init.html')));
 	}
 	const itemId = getItemId(path);
 	if (itemId === 'component/index.json') {

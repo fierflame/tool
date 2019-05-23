@@ -95,7 +95,7 @@ const setComponent = (() => {
 function showComponent(name, title) {
 	setComponent(name);
 	const main = document.getElementById('main');
-	document.getElementById('title').innerText = title || '王晨旭的工具箱';
+	document.getElementById('title').innerText = title || '开发者工具';
 	const components = Array.from(document.getElementsByClassName('main'));
 	const component = document.createElement(`xutool-${name}`);
 	component.innerHTML = `<div class="loadding-box"><div class="loadding"></div><p>如果长时间未完成加载</p><p>可能是浏览器版本太低</p><p>请升级浏览器后再试</p></div>`
