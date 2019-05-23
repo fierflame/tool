@@ -3,7 +3,7 @@ const itemVersion = {
 	'component/qrcode.js': 3,
 };
 const baseItem = [ 'init.html', 'xutool.html', 'pwa.html', 'script.js', 'style.css',];
-baseItem.forEach(it => itemVersion[id] = baseItemVersion);
+baseItem.forEach(it => itemVersion[it] = baseItemVersion);
 
 
 const cacheName = 'xutool-item';
