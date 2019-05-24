@@ -56,7 +56,7 @@ export async function loadComponent(path) {
 	return componentPromise[path] = import(`./${path}.js`).then(({default: def}) => def);
 }
 function getName(name = '') {
-	name = /^[a-z0-9]+$/.test(name) ? `xutool-${name}` : /^xutool-[a-z0-9]+$/.test(name) ? name : '';
+	name = /^[a-z0-9\-]+$/.test(name) ? `xutool-${name}` : /^xutool-[a-z0-9]+$/.test(name) ? name : '';
 	while(components[name] || !name) {
 		name = `xutool-component-r${Math.floor(Math.random() * 100000000)}`
 	};

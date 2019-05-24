@@ -13,7 +13,7 @@ function getPath(url) {
 }
 function getPageId(path) {
 	if (!path) { return 'index/'; }
-	let info = /^([a-z0-9]+)(?:\.html|\/(?:index(?:\.html)?)?)?$/.exec(path);
+	let info = /^([a-z0-9\-]+)(?:\.html|\/(?:index(?:\.html)?)?)?$/.exec(path);
 	if (!info) { return; }
 	let toolId = info[1];
 	if (path[path.length - 1] === '/') { return toolId; }
@@ -21,7 +21,7 @@ function getPageId(path) {
 	return toolId + '/';
 }
 function getItemId(path) {
-	let info = /^([a-z0-9]+\/index\.js)$/.exec(path);
+	let info = /^([a-z0-9\-]+\/index\.js)$/.exec(path);
 	if (info) { return info[1] || ''; }
 	info = /^((?:component|util)\/[a-z0-9\-]+\.js)$/.exec(path);
 	if (info) { return info[1] || ''; }
