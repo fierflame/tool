@@ -4,34 +4,31 @@
 	<meta charset="UTF-8">
 	<title><%= title ? `${title} | ` : '' %>开发者工具 @ 王晨旭的网站</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link rel="manifest" href="<%=isIndex ? './' : '../'%>manifest.json">
+	<link rel="stylesheet" href="<%=isIndex ? './' : '../'%>index.css">
+	<script type="module" src="<%=isIndex ? './' : '../'%>index.js"></script>
 	<meta name="theme-color" content="#08F">
 	<meta name="renderer" content="webkit"/>
 	<meta name="force-rendering" content="webkit"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
-	<link rel="manifest" href="manifest.json">
-	<link rel="stylesheet" href="./style.css">
 	<%if(isInit || isPWA || isTool) {%><meta name="robots" content="noindex"><%}%>
 	<%if(isPWA || isTool) {%><style>main{max-width: none;}</style><%}%>
-	<%if(isInit) {%><script>window.isBase = true;</script><%}%>
-	<script src="./script.js"></script>
 </head>
 <body>
 	<%if(!isPWA && !isTool){%><header>
 		<div>
-			<a href="/" id="site-logo"><img src="./logo/logo.svg">开发者工具</a>
+			<a href="<%=isIndex ? './' : '../'%>" id="site-logo"><img src="<%=isIndex ? './' : '../'%>logo/logo.svg">开发者工具</a>
 			<nav><a target="_blank" href="http://www.wangchenxu.net/">博客</a></nav>
 		</div>
 	</header><%}%>
 	<main id="main">
 		<%if(!isTool){%><div id="tool-bar">
 			<%if(!isPWA){%><a class="set-top btn" href="#main">#</a><%}%>
-			<%if(!isPWA){%><a class="go-home btn" href="./">首页</a><%}%>
-			<%if(isPWA){%><a class="go-home btn" href="?">首页</a><%}%>
-			<div id="title"><%= !isIndex && !isPWA && !isTool && !isInit && title ? title : '开发者工具' %></div>
-			<%if(!isPWA){%><a class="fullscreen btn" href="#main" onclick="switchFullscreen(this.parentNode.parentNode)">全屏</a><%}%>
+			<a class="go-home btn" href="<%=isIndex ? './' : '../'%>" data-xu-tool-id="index">首页</a>
+			<div id="title"><%= title || '开发者工具' %></div>
 		</div><%}%>
 		<%if (isIndex) {%><ul class="main" id="home-index"><%for (let it of list) {%>
-				<li><a href="./<%=it.id%>" title="<%=it.title%>"><h2><%=it.title%></h2><p><%=it.explain%></p></a></li>
+				<li><a href="./<%=it.id%>/" data-xu-tool-id="<%=it.id%>" title="<%=it.title%>"><h2><%=it.title%></h2><p><%=it.explain%></p></a></li>
 		<%}%></ul><%} else {%><xutool-xutool class="main">
 			<div class="loadding-box">
 				<div class="loadding"></div>

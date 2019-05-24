@@ -1,29 +1,35 @@
-const baseItemVersion = 5;
+const baseItemVersion = 0;
 const itemVersion = {
-	'component/qrcode.js': 4,
 };
-const baseItem = [ 'init.html', 'xutool.html', 'pwa.html', 'script.js', 'style.css',];
+const baseItem = [ './index/index.html', './pwa/index.html', './xutool/index.html', './index.js', './index.css',];
 baseItem.forEach(it => itemVersion[it] = baseItemVersion);
 
 
-const cacheName = 'xutool-item';
+const cacheName = 'tools@wangchenxu.net';
 const serviceRoot = self.location.href.replace(/\/*([^/]*)(?:[#?].*)?$/, '/');
 function getPath(url) {
 	if (url.indexOf(serviceRoot) !== 0) { return; }
 	return url.substr(serviceRoot.length).replace(/[#?].*$/, '');
 }
 function getPageId(path) {
-	let info = /^([a-z0-9\-]*)(?:\.html|\/)?$/.exec(path);
-	if (info) { return info[1] || 'index'; }
+	if (!path) { return 'index/'; }
+	let info = /^([a-z0-9]+)(?:\.html|\/(?:index(?:\.html)?)?)?$/.exec(path);
+	if (!info) { return; }
+	let toolId = info[1];
+	if (path[path.length - 1] === '/') { return toolId; }
+	if (path.indexOf('/') !== -1) { return './'; }
+	return toolId + '/';
 }
 function getItemId(path) {
-	let info = /^((?:component|util)\/[a-z0-9\-]*\.js)$/.exec(path);
+	let info = /^([a-z0-9]+\/index\.js)$/.exec(path);
 	if (info) { return info[1] || ''; }
-	info = /^(logo\/\d+\.png)$/.exec(path);
+	info = /^((?:component|util)\/[a-z0-9\-]+\.js)$/.exec(path);
 	if (info) { return info[1] || ''; }
-	info = /^(logo\/logo\.svg)$/.exec(path);
+	info = /^(logo\/(?:\d+\.png|logo\.svg))$/.exec(path);
 	if (info) { return info[1] || ''; }
 	info = /^(favicon\.ico)$/.exec(path);
+	if (info) { return info[1] || ''; }
+	info = /^(index\.json)$/.exec(path);
 	if (info) { return info[1] || ''; }
 }
 
@@ -61,12 +67,13 @@ async function updateItem(id, oldRes, version = itemVersion[id]) {
 }
 function updateList() {
 	setTimeout(updateList, 6 * 60 *60 * 1000);
-	backup('./component/index.json');
+	backup('./list.js');
 }
 
 self.addEventListener('install', function(event) {
 	caches.delete('page-1')
 	caches.delete('xutool-base-page')
+	caches.delete('xutool-item')
 	event.waitUntil(caches.open(cacheName)
 		.then(cache => Promise.all(
 			baseItem.map(async k => updateItem(k, await cache.match(k), baseItem[k]))
@@ -78,21 +85,21 @@ self.addEventListener('fetch', function(event) {
 	if (event.request.method !== 'GET') { return; }
 	const path = getPath(event.request.url);
 	if (typeof path !== 'string') { return; }
-	if (path === 'script.js') {
-		return event.respondWith(caches.match('./script.js').then(res => res || backup(path)));
-	} else if (path === 'style.css') {
-		return event.respondWith(caches.match('./style.css').then(res => res || backup(path)));
+	if (['index.js', 'index.css', 'list.js'].includes(path)) {
+		return event.respondWith(caches.match(path).then(res => res || backup(path)));
 	}
 	const pageId = getPageId(path);
-	if (pageId === 'pwa') {
-		return event.respondWith(caches.match('./pwa.html').then(res => res || backup('pwa.html')));
+	if (pageId && pageId[pageId.length - 1] === '/') {
+		return event.respondWith(Promise.resolve(new Response('',{ status: 301, headers: { location: pageId, } })));
+	} else if (pageId === 'pwa') {
+		return event.respondWith(caches.match('./pwa/').then(res => res || backup('./pwa/index.html')));
 	} else if (pageId === 'xutool') {
-		return event.respondWith(caches.match('./xutool.html').then(res => res || backup('xutool.html')));
+		return event.respondWith(caches.match('./xutool/').then(res => res || backup('./xutool/index.html')));
 	} else if (pageId) {
-		return event.respondWith(caches.match('./init.html').then(res => res || backup('init.html')));
+		return event.respondWith(caches.match('./index/').then(res => res || backup('./index/index.html')));
 	}
 	const itemId = getItemId(path);
-	if (itemId === 'component/index.json') {
+	if (itemId === 'index.json') {
 		return event.respondWith(caches.match(`./${itemId}`).then(res => res ? res : backup(itemId)));
 	}
 	if (itemId) {

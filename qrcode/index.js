@@ -10,7 +10,7 @@ export default class Qrcode extends HTMLElement {
 	:host { display: flex; flex-direction: column; --width: 120px; position: relative; }
 	.main { display: flex; flex: 1;  height: calc(100% - 40px);}
 	.main > * { overflow: auto; }
-	textarea{resize: none;}
+	textarea{ resize: none; line-height: 1.5!important;}
 	label { white-space:nowrap; }
 	* { box-sizing: border-box; margin: 0; }
 	#selector { height: 40px; white-space:nowrap; background: #51AEFF; overflow: auto;}
@@ -18,8 +18,8 @@ export default class Qrcode extends HTMLElement {
 	#selector span.select { background: #08F; color: #FFF; }
 	form { flex: 1; display: none; flex-direction: column; }
 	form.select { display: flex; }
-	form > * { margin: 10px auto; max-width: 800px; width: 95%; display: flex; min-height: 30px; line-height: 30px; }
-	form > button { display: inline-block; max-width: 200px; width: 100%; text-align: center; }
+	form > * { margin: 2px auto; max-width: 800px; width: 95%; display: flex; min-height: 30px; line-height: 30px; }
+	form > button { margin: 10px auto; display: inline-block; max-width: 200px; width: 100%; text-align: center; }
 	form input, form select { flex: 1; }
 	main { flex: 1; display: flex; flex-direction: column; }
 	#info { width: var(--width); display: flex; flex-direction: column; overflow: auto}
@@ -43,19 +43,19 @@ export default class Qrcode extends HTMLElement {
 	<main>
 		<form data-type-id="text">
 			<input name="type" value="text" type="hidden" />
-			<textarea name="text" rows="10"></textarea>
+			<textarea name="text" rows="10" required placeholder="要生成二维码的文本，必填" ></textarea>
 			<button type="submit">生成二维码</button>
 		</form>
 		<form data-type-id="url">
 			<input name="type" value="text" type="hidden" />
-			<label>URL:<input  name="text" type="url" /></label>
+			<label>URL:<input  name="text" type="url" required placeholder="要生成二维码的URL，必填" /></label>
 			<button type="submit">生成二维码</button>
 		</form>
 		<form data-type-id="vcard">
 			<input name="type" value="vcard" type="hidden" />
 			<label>个人信息:</label>
 			<label>姓名:<input name="fullname" type="text" required placeholder="姓名，必填" /></label>
-			<label>称呼:<input name="nickname" type="text" /></label>
+			<label>称呼:<input name="nickname" type="text" placeholder="称呼或者昵称"/></label>
 			<label>手机:<input name="mytel" type="tel" placeholder="个人的联系电话" /></label>
 			<label>邮箱:<input name="myemail" type="email" placeholder="个人的联系电话" /></label>
 			<label>网站:<input name="myurl" type="url" placeholder="个人网站、博客" /></label>
@@ -72,13 +72,13 @@ export default class Qrcode extends HTMLElement {
 		</form>
 		<form data-type-id="wifi">
 			<input name="type" value="wifi" type="hidden" />
-			<label>WiFi名称:<input name="S" type="text" /></label>
+			<label>WiFi名称:<input name="S" type="text" required placeholder="WiFi的名称，必填" /></label>
 			<label>加密方式:<select name="T">
 				<option value="">不加密(无密码)/自动识别</option>
 				<option value="WPA">WPA</option>
 				<option value="WPA2">WPA2</option>
 			</select></label>
-			<label>WiFi密码:<input name="P" type="text" /></label>
+			<label>WiFi密码:<input name="P" type="text" placeholder="WiFi的密码，当加密方式为 WPA 或 WPA2 时必填" /></label>
 			<button type="submit">生成二维码</button>
 		</form>
 	</main>
