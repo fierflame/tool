@@ -1,6 +1,6 @@
 {
 	"name": "Xu Tools 开发者工具",
-	"short_name": "Xu 工具",
+	"short_name": "开发者工具",
 	"description": "开发者常用工具合集",
 	"display": "standalone",
 	"start_url": "./pwa/",
