@@ -1,5 +1,5 @@
-const isPWA = /(?:\.\/)?pwa(?:\.html)?$/.test(location.pathname);
-const isTool = /(?:\.\/)?xutool(?:\.html)?$/.test(location.pathname);
+const isPWA = /(?:\.\/)?pwa(?:\.html|\/)?$/.test(location.pathname);
+const isTool = /(?:\.\/)?xutool(?:\.html|\/)?$/.test(location.pathname);
 if (isPWA && parent !== this) { location = `./`; }
 
 // 自动切换
@@ -45,7 +45,7 @@ const loadComponent = (() => {
 	return async (id) => {
 		if (id in components) { return components[id]; }
 		if (!id || id === 'index') {
-			const getUrl = isPWA ? id => `?${id}` : id => `./${id}.html`;
+			const getUrl = isPWA ? id => `?${id}` : id => `./${id}`;
 			return components[id] = loadList().then(list => class Index extends HTMLElement {
 				constructor() {
 					super();
@@ -128,7 +128,7 @@ window.addEventListener('load', x => {
 	if (isPWA) {
 		id = location.search.substr(1);
 	} else {
-		let id = location.pathname.replace(/\/([^/]*?)(?:\.html)$/, '$1');
+		let id = location.pathname.replace(/\/([^/]*?)(?:\.html|\/)$/, '$1');
 		if (id === '/') { id = 'index'; }
 	}
 
@@ -141,8 +141,8 @@ window.addEventListener('load', x => {
 		let id = '';
 		if (/^\?([a-z0-9]*)(?:#.*)?$/.test(href)) {
 			id = /^\?([a-z0-9]*)(?:#.*)?$/.exec(href)[1] || 'index';
-		} else if (/(?:\.\/)?([a-z0-9\-]+)(?:\.html)?(?:[?#].*)?$/.test(href)) {
-			id = /(?:\.\/)?([a-z0-9]+)(?:\.html)?(?:[?#].*)?$/.exec(href)[1];
+		} else if (/(?:\.\/)?([a-z0-9\-]+)(?:\.html|\/)?(?:[?#].*)?$/.test(href)) {
+			id = /(?:\.\/)?([a-z0-9]+)(?:\.html|\/)?(?:[?#].*)?$/.exec(href)[1];
 		} else if (href === './'){
 			id = 'index';
 		}
@@ -169,11 +169,11 @@ window.addEventListener('load', x => {
 	} else if (isTool) {
 		const id = location.search.substr(1);
 		if (!id || id === 'index' || parent === this) {
-			location = `./${id}.html`;
+			location = `./${id}`;
 		}
 		setComponent('xutool', id);
 	} else {
-		let id = location.pathname.replace(/\/([a-z0-9\-]+)(?:\.html)?$/, '$1');
+		let id = location.pathname.replace(/\/([a-z0-9\-]+)(?:\.html|\/)?$/, '$1');
 		if (!window.isBase) {
 			if (id[id.length - 1] !== '/') {
 				showComponent(id, document.getElementById('title').innerText);

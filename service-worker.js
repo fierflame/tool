@@ -1,4 +1,4 @@
-const baseItemVersion = 4;
+const baseItemVersion = 5;
 const itemVersion = {
 	'component/qrcode.js': 4,
 };
@@ -13,7 +13,7 @@ function getPath(url) {
 	return url.substr(serviceRoot.length).replace(/[#?].*$/, '');
 }
 function getPageId(path) {
-	let info = /^([a-z0-9\-]*)(?:\.html)?$/.exec(path);
+	let info = /^([a-z0-9\-]*)(?:\.html|\/)?$/.exec(path);
 	if (info) { return info[1] || 'index'; }
 }
 function getItemId(path) {

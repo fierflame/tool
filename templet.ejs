@@ -31,7 +31,7 @@
 			<%if(!isPWA){%><a class="fullscreen btn" href="#main" onclick="switchFullscreen(this.parentNode.parentNode)">全屏</a><%}%>
 		</div><%}%>
 		<%if (isIndex) {%><ul class="main" id="home-index"><%for (let it of list) {%>
-				<li><a href="./<%=it.id%>.html" title="<%=it.title%>"><h2><%=it.title%></h2><p><%=it.explain%></p></a></li>
+				<li><a href="./<%=it.id%>" title="<%=it.title%>"><h2><%=it.title%></h2><p><%=it.explain%></p></a></li>
 		<%}%></ul><%} else {%><xutool-xutool class="main">
 			<div class="loadding-box">
 				<div class="loadding"></div>
