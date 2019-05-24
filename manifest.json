@@ -4,7 +4,6 @@
 	"description": "开发者常用工具合集",
 	"display": "standalone",
 	"start_url": "./pwa/",
-	"scope": "./pwa/",
 	"background_color": "#0088FF",
 	"theme_color": "#0088FF",
 	"icons": [
