@@ -1,4 +1,4 @@
-const baseItemVersion = 0;
+const baseItemVersion = 1;
 const itemVersion = {
 };
 const baseItem = [ './index/index.html', './pwa/index.html', './xutool/index.html', './index.js', './index.css',];

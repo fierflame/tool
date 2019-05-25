@@ -8,8 +8,8 @@ if (toolId.indexOf(path) === 0) {
 	isIndex = !toolId || toolId === 'index' || toolId === 'index.html';
 	if (!toolId) {
 		toolId = 'index';
-	} else if (/^([a-z0-9]+)(?:\/(?:index(?:\.html)?)?)?$/.test(toolId)) {
-		toolId = /^([a-z0-9]+)(?:\/(?:index(?:\.html)?)?)?$/.exec(toolId)[1]
+	} else if (/^([a-z0-9\-]+)(?:\/(?:index(?:\.html)?)?)?$/.test(toolId)) {
+		toolId = /^([a-z0-9\-]+)(?:\/(?:index(?:\.html)?)?)?$/.exec(toolId)[1]
 	} else {
 		toolId = '';
 	}
@@ -50,7 +50,7 @@ const components = Object.create(null);
 export async function loadComponent(path) {
 	if (!path) { path = 'index'; }
 	if (path[path.length] === '/') { path += 'index'; }
-	if (path !== 'index' && /^[a-z0-9]+$/.test(path)) { path = path + '/index'; }
+	if (path !== 'index' && /^[a-z0-9\-]+$/.test(path)) { path = path + '/index'; }
 	if (path.substr(path.length - 3) === '.js') { path = path.substr(0, path.length - 3); }
 	if (path in componentPromise) { return componentPromise[path]; }
 	return componentPromise[path] = import(`./${path}.js`).then(({default: def}) => def);

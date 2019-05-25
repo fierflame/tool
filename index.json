@@ -1,5 +1,6 @@
 [
 	{"id": "base64", "title": "Base64 编码转换", "explain": "可以进行 base64 编码或解码"},
 	{"id": "file2base64", "title": "文件转换 Base64", "explain": "可以将文件转为 Base64 编码"},
-	{"id": "qrcode", "title": "Qrcode 二维码生成器", "explain": "可以生成文本、网址等的二维码"}
+	{"id": "qrcode", "title": "Qrcode 二维码生成器", "explain": "可以生成文本、网址等的二维码"},
+	{"id": "image-size", "title": "图片尺寸修改", "explain": "可以修改图片尺寸为合适大小"}
 ]
