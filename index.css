@@ -14,7 +14,7 @@ body {overscroll-behavior: none;  margin: 0; padding: 0;}
 	height: 148px;
 	margin: auto;
 	width: 200px;
-	color: #999;
+	color: var(--theme-border-color-default);
 }
 .loadding-box p {
 	margin: 0;
@@ -76,7 +76,7 @@ main {
 #tool-bar {
 	display: flex;
 	height: 40px;
-	border-bottom: 1px solid #999;
+	border-bottom: 1px solid var(--theme-border-color-default);
 	box-sizing: content-box;
 }
 #tool-bar > * {
@@ -84,7 +84,7 @@ main {
 	margin: 5px;
 	line-height: 28px;
 	height: 30px;
-	border: 1px #999 solid;
+	border: 1px var(--theme-border-color-default) solid;
 	box-sizing: border-box;
 }
 #tool-bar .btn {
@@ -129,7 +129,7 @@ main {
 	width: 100%;
 	line-height: 28px;
 	height: 30px;
-	border: 1px #999 solid;
+	border: 1px var(--theme-border-color-default) solid;
 	box-sizing: border-box;
 }
 .xutool-copyright {
@@ -139,7 +139,7 @@ main {
 	font-size: 12px;
 	padding: 0;
 	margin: 0;
-	border-top: 1px solid #999;
+	border-top: 1px solid var(--theme-border-color-default);
 }
 #home-index {
 	list-style: none;
@@ -154,7 +154,7 @@ main {
 #home-index a {
 	margin: 2px;
 	display: block;
-	border: 1px #999 solid;
+	border: 1px var(--theme-border-color-default) solid;
 	padding: 5px;
 	border-radius: 5px;
 	line-height: 1.5;
@@ -174,7 +174,7 @@ main {
 	font-size: 16px;
 }
 #home-index p {
-	color: #999;
+	color: var(--theme-border-color-default);
 	font-size: 12px;
 }
 header {
@@ -226,4 +226,65 @@ footer li{
 footer a{
 	color: inherit;
 	text-decoration: underline;
+}
+main#main {
+
+	--theme-border-color-default: #999;
+
+	--themeused-text-color: var(--theme-text-color, #000);
+	--themeused-text-color-hover: var(--theme-text-color-hover, var(--theme-text-color, #000));
+	--themeused-border-color: var(--theme-border-color, var(--theme-border-color-default));
+	--themeused-border-color-hover: var(--theme-border-color-hover, var(--theme-border-color, var(--theme-border-color-default)));
+	--themeused-background-color: var(--theme-background-color, #FFF);
+	--themeused-background-color-hover: var(--theme-background-color-hover, var(--theme-background-color, #FFF));
+
+	--themeused-button-text-color: var(--theme-button-text-color, var(--theme-text-color, inherit));
+	--themeused-button-text-color-hover: var(--theme-button-text-color-hover, var(--theme-button-text-color, var(--theme-text-color-hover, var(--theme-text-color, inherit))));
+	--themeused-button-border-color: var(--theme-button-border-color, var(--theme-border-color, var(--theme-border-color-default)));
+	--themeused-button-border-color-hover: var(--theme-button-border-color-hover, var(--theme-button-border-color, var(--theme-border-color-hover, var(--theme-border-color, var(--theme-border-color-default)))));
+	--themeused-button-background-color: var(--theme-button-background-color, var(--theme-background-color, #FFF));
+	--themeused-button-background-color-hover: var(--theme-button-background-color-hover, var(--theme-button-background-color, var(--theme-background-color-hover, var(--theme-background-color, #DDD))));
+
+	--themeused-input-text-color: var(--theme-input-text-color, var(--theme-text-color, inherit));
+	--themeused-input-text-color-hover: var(--theme-input-text-color-hover, var(--theme-input-text-color, var(--theme-text-color-hover, var(--theme-text-color, inherit))));
+	--themeused-input-border-color: var(--theme-input-border-color, var(--theme-border-color, var(--theme-border-color-default)));
+	--themeused-input-border-color-hover: var(--theme-input-border-color-hover, var(--theme-input-border-color, var(--theme-border-color-hover, var(--theme-border-color, var(--theme-border-color-default)))));
+	--themeused-input-background-color: var(--theme-input-background-color, var(--theme-background-color, #FFF));
+	--themeused-input-background-color-hover: var(--theme-input-background-color-hover, var(--theme-input-background-color, var(--theme-background-color-hover, var(--theme-background-color, #DDD))));
+
+	--themeused-input-placeholder-text-color: var(--theme-input-placeholder-text-color, #777);
+	--themeused-input-placeholder-text-color-hover: var(--theme-input-placeholder-text-color-hover, var(--theme-input-placeholder-text-color, #777));
+	--themeused-input-placeholder-border-color: var(--theme-input-placeholder-border-color, var(--theme-item-color, var(--theme-border-color, var(--theme-border-color-default))));
+	--themeused-input-placeholder-border-color-hover: var(--theme-input-placeholder-border-color-hover, var(--theme-input-placeholder-border-color, var(--theme-item-color-hover, var(--theme-item-color, var(--theme-border-color-hover, var(--theme-border-color, var(--theme-border-color-default)))))));
+	--themeused-input-placeholder-background-color: var(--theme-input-placeholder-background-color, var(--theme-item-color, var(--theme-background-color, #FFF)));
+	--themeused-input-placeholder-background-color-hover: var(--theme-input-placeholder-background-color-hover, var(--theme-input-placeholder-background-color, var(--theme-item-color-hover, var(--theme-item-color, var(--theme-background-color-hover, var(--theme-background-color, #DDD))))));
+
+	--themeused-mask-text-color: var(--theme-mask-text-color, var(--theme-text-color, inherit));
+	--themeused-mask-text-color-hover: var(--theme-mask-text-color-hover, var(--theme-mask-text-color, var(--theme-text-color-hover, var(--theme-text-color, inherit))));
+	--themeused-mask-border-color: var(--theme-mask-border-color, var(--theme-border-color, var(--theme-border-color-default)));
+	--themeused-mask-border-color-hover: var(--theme-mask-border-color-hover, var(--theme-mask-border-color, var(--theme-border-color-hover, var(--theme-border-color, var(--theme-border-color-default)))));
+	--themeused-mask-background-color: var(--theme-mask-background-color, var(--theme-background-color, rgba(0,0,0, 0.5)));
+	--themeused-mask-background-color-hover: var(--theme-mask-background-color-hover, var(--theme-mask-background-color, var(--theme-background-color-hover, var(--theme-background-color, rgba(0,0,0, 0.5)))));
+
+	--themeused-item-text-color: var(--theme-item-text-color, var(--theme-text-color, inherit));
+	--themeused-item-text-color-hover: var(--theme-item-text-color-hover, var(--theme-item-text-color, var(--theme-text-color-hover, var(--theme-text-color, inherit))));
+	--themeused-item-border-color: var(--theme-item-border-color, var(--theme-border-color, var(--theme-border-color-default)));
+	--themeused-item-border-color-hover: var(--theme-item-border-color-hover, var(--theme-item-border-color, var(--theme-border-color-hover, var(--theme-border-color, var(--theme-border-color-default)))));
+	--themeused-item-background-color: var(--theme-item-background-color, var(--theme-background-color, #FFF));
+	--themeused-item-background-color-hover: var(--theme-item-background-color-hover, var(--theme-item-background-color, var(--theme-background-color-hover, var(--theme-background-color, #DDD))));
+
+	--themeused-item-title-text-color: var(--theme-item-title-text-color, var(--theme-item-text-color, var(--theme-text-color, inherit)));
+	--themeused-item-title-text-color-hover: var(--theme-item-title-text-color-hover, var(--theme-item-title-text-color, var(--theme-item-text-color-hover, var(--theme-item-text-color, var(--theme-text-color-hover, var(--theme-text-color, inherit))))));
+	--themeused-item-title-border-color: var(--theme-item-title-border-color, var(--theme-item-border-color, var(--theme-border-color, var(--theme-border-color-default))));
+	--themeused-item-title-border-color-hover: var(--theme-item-title-border-color-hover, var(--theme-item-title-border-color, var(--theme-item-border-color-hover, var(--theme-item-border-color, var(--theme-border-color-hover, var(--theme-border-color, var(--theme-border-color-default)))))));
+	--themeused-item-title-background-color: var(--theme-item-title-background-color, var(--theme-item-background-color, var(--theme-background-color, #FFF)));
+	--themeused-item-title-background-color-hover: var(--theme-item-title-background-color-hover, var(--theme-item-title-background-color, var(--theme-item-background-color-hover, var(--theme-item-background-color, var(--theme-background-color-hover, var(--theme-background-color, #DDD))))));
+
+	--themeused-item-explain-text-color: var(--theme-item-explain-text-color, var(--theme-item-text-color, var(--theme-text-color, inherit)));
+	--themeused-item-explain-text-color-hover: var(--theme-item-explain-text-color-hover, var(--theme-item-explain-text-color, var(--theme-item-text-color-hover, var(--theme-item-text-color, var(--theme-text-color-hover, var(--theme-text-color, inherit))))));
+	--themeused-item-explain-border-color: var(--theme-item-explain-border-color, var(--theme-item-border-color, var(--theme-border-color, var(--theme-border-color-default))));
+	--themeused-item-explain-border-color-hover: var(--theme-item-explain-border-color-hover, var(--theme-item-explain-border-color, var(--theme-item-border-color-hover, var(--theme-item-border-color, var(--theme-border-color-hover, var(--theme-border-color, var(--theme-border-color-default)))))));
+	--themeused-item-explain-background-color: var(--theme-item-explain-background-color, var(--theme-item-background-color, var(--theme-background-color, #FFF)));
+	--themeused-item-explain-background-color-hover: var(--theme-item-explain-background-color-hover, var(--theme-item-explain-background-color, var(--theme-item-background-color-hover, var(--theme-item-background-color, var(--theme-background-color-hover, var(--theme-background-color, #DDD))))));
+
 }
