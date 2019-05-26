@@ -23,8 +23,8 @@
 	</header><%}%>
 	<main id="main">
 		<%if(!isTool){%><div id="tool-bar">
-			<%if(!isPWA){%><a class="set-top btn" href="#main">#</a><%}%>
-			<a class="go-home btn" href="<%=isIndex ? './' : '../'%>" data-xu-tool-id="index">首页</a>
+			<%if(!isPWA){%><a class="btn" href="#main">#</a><%}%>
+			<a class="btn" href="<%=isIndex ? './' : '../'%>" data-xu-tool-id="index">首页</a>
 			<div id="title"><%= title || '开发者工具' %></div>
 		</div><%}%>
 		<%if (isIndex) {%><ul class="main" id="home-index"><%for (let it of list) {%>

@@ -1,3 +1,5 @@
+import {generateThemeStyle} from '../index.js';
+
 export default class Base64 extends HTMLElement {
 	static get observedAttributes() {
 		return ['unclosable', 'width', 'opened'];
@@ -8,68 +10,25 @@ export default class Base64 extends HTMLElement {
 		this._shadow = shadow;
 		shadow.innerHTML = `
 <style>
-:host {
-	display: flex;
-	flex-direction: column;
-	position: relative;
-}
-#selectFile  {
-	height: 60px;
-}
-
-ol {
-	overflow: auto;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-}
-li {
-	display: flex;
-	flex-direction: column;
-	font-size: 14px;
-}
-li > * {
-	display: flex;
-}
-li:hover {
-	background: #DDD;
-}
-textarea {
-	height: 80px;
-	resize: none;
-	background: none;
-}
-ol button {
-	margin: 5px;
-	height: 30px;
-}
-output, input {
-	background: none;
-	margin: 0;
-	height: 40px;
-	line-height: 40px;
-	border: none;
-	outline: none;
-}
-.name {
-	flex: 1;
-}
-progress {
-	flex: 2;
-	margin: auto;
-}
-.size {
-	margin: 0 5px 0 0;
-	width: 60px;
-	text-align: right;
-}
+:host { display: flex; flex-direction: column; position: relative; }
+#selectFile  { height: 60px; }
+ol { overflow: auto; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; flex: 1; }
+li { display: flex; flex-direction: column; font-size: 14px; }
+li > * { display: flex; }
+textarea { height: 80px; resize: none; background: none; border: 1px solid; }
+ol button { margin: 5px; height: 30px; }
+output, input { background: none; margin: 0; height: 40px; line-height: 40px; border: none; outline: none; }
+.name { flex: 1; }
+progress { flex: 2; margin: auto; }
+.size { margin: 0 5px 0 0; width: 60px; text-align: right; }
+button { border: 1px solid; }
+${generateThemeStyle(':host')}
+${generateThemeStyle('button', 'button')}
+${generateThemeStyle('textarea', 'input')}
+${generateThemeStyle('li', 'item')}
 </style>
 <button id="selectFile">选择文件或将文件拖动到此处</button>
-<ol></ol>
-		`
+<ol></ol>`
 		this._files = shadow.querySelector('ol');
 		shadow.getElementById('selectFile').addEventListener('click', _ => this.selectFile());
 

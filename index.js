@@ -1,11 +1,18 @@
+
 import list from './list.js';
+
+/**
+ * 系统相关配置
+ * @var path 系统的路径
+ * @var toolId 工具Id
+ * @var isTool 是否为嵌入式工具页面
+ * @var isPWA 是否为 PWA 页面
+ */
 export const path = import.meta.url.replace(/^([^#?]*\/)(?:[^/#?]*)(?:[#?].*)?$/i, '$1');
-let isIndex = false;
 // 工具Id，如果为空，怎表示不是工具页面
 let toolId = location.href.replace(/^([^#?]*)(?:[#?].*)?$/, '$1');
 if (toolId.indexOf(path) === 0) {
 	toolId = toolId.substr(path.length);
-	isIndex = !toolId || toolId === 'index' || toolId === 'index.html';
 	if (!toolId) {
 		toolId = 'index';
 	} else if (/^([a-z0-9\-]+)(?:\/(?:index(?:\.html)?)?)?$/.test(toolId)) {
@@ -19,10 +26,14 @@ if (toolId.indexOf(path) === 0) {
 const isTool = toolId === 'xutool';
 const isPWA = toolId === 'pwa';
 
+/** 更新 Manifest 文件地址为绝对地址 */
 (document.querySelector('link[rel=manifest]') || {}).href = path + 'manifest.json';
-if ('serviceWorker' in navigator) {
-	navigator.serviceWorker.register(path + 'service-worker.js')
-}
+/** 启动服务进程 */
+if ('serviceWorker' in navigator) { navigator.serviceWorker.register(path + 'service-worker.js'); }
+
+/**
+ * 页面路由
+ */
 /**
  * 跳转的指定工具
  * @param {string} id 工具Id
@@ -43,7 +54,9 @@ function gotoTool(id, title, replace = false) {
 window.addEventListener('popstate', ({state}) => state && state.id && showComponent(state.id, state.title));
 
 
-
+/**
+ * 组件管理
+ */
 const componentPromise = Object.create(null);
 const componentMap = new Map();
 const components = Object.create(null);
@@ -88,6 +101,215 @@ export function showComponent(id, title) {
 	}
 }
 
+/**
+ * 主题切换管理函数
+ */
+
+export function generateThemeStyle(selector = '', type = '', posterity = ''){
+	selector = selector.replace(/\s+$/, '');
+	if (type === 'default') { type = ''; }
+	type = type.replace(/\-+/g, '').replace(/([A-Z])/g, '-$1').toLowerCase();
+	if (type && type[0] !== '-') { type = '-' + type; }
+	return `${selector} ${posterity} {
+		color: var(--themeused${type}-text-color)!important;
+		border-color: var(--themeused${type}-border-color)!important;
+		background-color: var(--themeused${type}-background-color)!important;
+	}
+	${selector}:hover ${posterity} {
+		color: var(--themeused${type}-text-color-hover)!important;
+		border-color: var(--themeused${type}-border-color-hover)!important;
+		background-color: var(--themeused${type}-background-color-hover)!important;
+	}
+	${selector}:focus ${posterity} {
+		color: var(--themeused${type}-text-color-focus)!important;
+		border-color: var(--themeused${type}-border-color-focus)!important;
+		background-color: var(--themeused${type}-background-color-focus)!important;
+	}`
+}
+export function getThemeStyle(themeInfoList, theme) {
+	function getStyleName(name, type) {
+		if (name === 'default') { name = ''; }
+		name = name.replace(/\-+/g, '').replace(/([A-Z])/g, '-$1').toLowerCase();
+		if (name && name[0] !== '-') { name = '-' + name; }
+		type = type.replace(/\-+/g, '').replace(/([A-Z])/g, '-$1').toLowerCase();
+		if (type && type[0] !== '-') { type = '-' + type; }
+		return `--themeused${name}${type}`;
+	}
+	function getValue(theme, name, type) {
+		if (name === 'default') { name = ''; }
+		const t = name ? name + type[0].toUpperCase() + type.substr(1) : type;
+		return t in theme ? theme[t] : '';
+	}
+	function getDefaultValue(info, name, type, def) {
+		let item = info[name];
+		if (!item) { return def; }
+		if (item.value && item.value[type]) {
+			return item.value[type];
+		} else if (item.valueExtends && item.valueExtends[type]){
+			let it = info[item.valueExtends[type]];
+			if (it && it.value && it.value[type]) {
+				return it.value[type];
+			}
+		}
+		return def;
+	}
+	function generateThemeTypeValueList(info, theme, name, type) {
+		let item = info[name];
+		const extend = [name, ...(item.extends || [])];
+		let baseValue, hoverValue, focusValue;
+		for (let name of extend) {
+			baseValue = baseValue || getValue(theme, name, type, 'inherit');
+			hoverValue = hoverValue || getValue(theme, name, type + 'Hover') || baseValue;
+			focusValue = focusValue || getValue(theme, name, type + 'Focus') || hoverValue;
+			if (baseValue && hoverValue && focusValue) { break; }
+		}
+		baseValue = baseValue || getDefaultValue(info, name, type);
+		hoverValue = hoverValue || getDefaultValue(info, name, type + 'Hover', baseValue);
+		focusValue = focusValue || getDefaultValue(info, name, type + 'Focus', hoverValue);
+
+		const styleName = getStyleName(name, type);
+		return {
+			[`${styleName}`]: baseValue,
+			[`${styleName}-hover`]: hoverValue,
+			[`${styleName}-focus`]: focusValue,
+		}
+	}
+	const style = Object.create({});
+	for (let name in themeInfoList) {
+		Object.assign(style, generateThemeTypeValueList(themeInfoList, theme, name, 'textColor'));
+		Object.assign(style, generateThemeTypeValueList(themeInfoList, theme, name, 'borderColor'));
+		Object.assign(style, generateThemeTypeValueList(themeInfoList, theme, name, 'backgroundColor'));
+	}
+	return style;
+}
+/**
+ * 主题相关
+ * @var themeInfoList 主题信息列表
+ * @var themes 系统主题
+ * @var customThemes 自定义主题
+ * @var themeList 主题列表
+ */
+const themeInfoList = {
+	'default': {title: '默认', extends: [], value: { textColor: '#000', borderColor: '#999', backgroundColor: '#FFF', }},
+	'title': {title: '默认标题', extends: ['default'], value: { textColor: '#69E', }},
+	'explain': {title: '默认说明', extends: ['default'], value: { textColor: '#999', }},
+	'button': {title: '按钮', extends: ['default'], valueExtends: { borderColor: 'default', }, value: { textColor: '#00F', backgroundColorHover: '#DDD', }},
+	'input': {title: '输入框', extends: ['default'], valueExtends: { textColor: 'default', borderColor: 'default', }, value: { backgroundColorHover: '#DDD', }},
+	'mask': {title: '遮罩层', extends: [], value: { textColor: '#DDD', borderColor: 'rgba(0,0,0, 0.5)', backgroundColor: 'rgba(0,0,0, 0.5)', }},
+	'item': {title: '项目', extends: ['default'], valueExtends: { borderColor: 'default', }, value: { backgroundColorHover: '#DDD', }},
+	'itemTitle': {title: '项目标题', extends: ['item', 'title', 'default'], valueExtends:{ textColor: 'title', }, value: { borderColor: 'inherit', backgroundColor: 'inherit', }},
+	'itemExplain': {title: '项目说明', extends: ['item', 'explain', 'default'], valueExtends:{ textColor: 'explain', }, value: { borderColor: 'inherit', backgroundColor: 'inherit', }},
+};
+
+const themes = {
+	default: {},
+	dark: {
+		textColor: '#CCC',
+		borderColor: '#999',
+		backgroundColor: '#222',
+		titleTextColor: '#69E',
+		explainTextColor: '#999',
+
+		buttonTextColor: '#00F',
+		buttonBackgroundColorHover: '#444',
+		inputBackgroundColorHover: '#444',
+		itemBackgroundColorHover: '#444',
+	}
+}
+const customThemes = JSON.parse(localStorage.getItem('xutools-theme-custom')) || {};
+
+export function setStyle(theme, element = document.getElementsByTagName('html')[0]){
+	const list = getThemeStyle(themeInfoList, theme);
+	for (let k in list) {
+		element.style.setProperty(k, list[k]);
+	}
+}
+let currentTheme = localStorage.getItem('xutools-theme') || 'default';
+export function switchTheme(theme, temp = false) {
+	if(!temp) {
+		currentTheme = theme;
+		localStorage.setItem('xutools-theme', theme);
+	}
+	if (!theme) {
+		theme = customThemes.custom;
+	} else if (theme in themes) {
+		theme = themes[theme];
+	} else {
+		theme = '';
+	}
+	setStyle(theme);
+}
+export const themeList = Object.keys(themes);
+switchTheme(currentTheme);
+
+/**
+ * 主题组件
+ */
+export class Theme extends HTMLElement {
+	constructor() {
+		super();
+		let shadow = this.attachShadow({mode:'open'});
+		this._shadow = shadow;
+		shadow.innerHTML = `
+			<style>
+			:host {
+				display: flex;
+			}
+			ul {
+				flex: 1;
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+			}
+			ul::before {
+				content: '主题列表'
+			}
+			ul::after {
+				content: '更多主题敬请期待'
+			}
+			ul::before，ul::after {
+				height: 20px;
+				box-sizing: content-box;
+				line-height: 20px;
+				padding: 5px;
+				border-radius: 5px;
+				margin: 5px;
+			}
+			li {
+				height: 20px;
+				box-sizing: content-box;
+				line-height: 20px;
+				padding: 5px;
+				border: 1px solid;
+				border-radius: 5px;
+				margin: 5px;
+			}
+			${generateThemeStyle(':host')};
+			${generateThemeStyle('li', 'item')};
+			</style>
+			<ul></ul>`
+			this.update();
+	}
+	update() {
+		const list = this._shadow.querySelector('ul');
+		list.innerHTML = '';
+		themeList.forEach(theme => {
+			const li = list.appendChild(document.createElement('li'));
+			li.innerText = theme;
+			li.addEventListener('click', x => {
+				switchTheme(theme);
+				this.dispatchEvent(new Event('close'))
+			})
+			li.addEventListener('mouseenter', x => switchTheme(theme, true))
+			li.addEventListener('mouseleave', x => switchTheme(currentTheme))
+		})
+	}
+}
+const themeTagName = registerComponent(Theme);
+/**
+ * 首页组件
+ */
 export default class Index extends HTMLElement {
 	constructor() {
 		super();
@@ -95,16 +317,18 @@ export default class Index extends HTMLElement {
 		this._shadow = shadow;
 		shadow.innerHTML = `
 			<style>
-				ul {list-style: none; margin: 0; padding: 0; overflow: auto; }
+				ul{ list-style: none; margin: 0; padding: 0; overflow: auto; }
+				ul * { margin: 0; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space:nowrap; }
 				@media (min-width:500px) { li { width: 50%; float: left; } }
 				@media (min-width:750px) { li { width: 33.3333%; } }
 				@media (min-width:1000px) { li { width: 25%; } }
 				@media (min-width:1250px) { li { width: 20%; } }
-				a { display:block; text-decoration: none; margin: 2px; border: 1px #999 solid; padding: 5px; border-radius: 5px; line-height: 1.5; }
-				a:hover { background: #DDD; }
-				a * { margin: 0; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space:nowrap; }
+				a { text-decoration: none; margin: 2px; display: block; border: 1px solid; padding: 5px; border-radius: 5px; line-height: 1.5; }
 				h2 { color:cornflowerblue; font-size: 16px; }
-				p { color: #999; font-size: 12px; }
+				p { color: var(--theme-border-color-default); font-size: 12px; }
+				${generateThemeStyle('a', 'item')}
+				${generateThemeStyle('a', 'itemTitle', 'h2')}
+				${generateThemeStyle('a', 'itemExplain', 'p')}
 			</style>
 			<ul id="home-index">
 				${list.map(({id, title, explain}) => `<li><a href="${path}${id}/" title="${title}" id="${id}"><h2>${title}</h2><p>${explain}</p></a></li>`).join('')}
@@ -118,6 +342,25 @@ export default class Index extends HTMLElement {
 			});
 		})
 	}
+}
+
+
+function createMask() {
+	const mask = document.getElementById('main').appendChild(document.createElement('div'));
+	mask.className = 'mask';
+	mask.addEventListener('click', event => {
+		if (event.path[0] === mask) {
+			mask.style.display = '';
+		}
+	})
+	return mask;
+}
+function createtoolButton(text) {
+	const btn = document.getElementById('tool-bar').appendChild(document.createElement('a'));
+	btn.className = "btn";
+	btn.href = '#main';
+	btn.innerText = text;
+	return btn;
 }
 
 window.addEventListener('load', x => {
@@ -136,7 +379,7 @@ window.addEventListener('load', x => {
 			location = `./${id === 'index' ? '' : id}`;
 		}
 		showComponent(id);
-	} else if (!isIndex) {
+	} else {
 		const id = isPWA ? location.search.substr(1) : toolId;
 		const it = list.find(v => v.id === id);
 		if (it) {
@@ -144,49 +387,48 @@ window.addEventListener('load', x => {
 		} else {
 			gotoTool('index', '', true);
 		}
-	} else {
-		gotoTool(toolId, document.getElementById('title').innerText, true);
+	}
+
+	const toolBar = document.getElementById('tool-bar');
+	if (!toolBar) { return; }
+	if (!isTool) {
+		const mask = createMask();
+		const theme = mask.appendChild(document.createElement(themeTagName));
+		theme.addEventListener('close', x => {mask.style.display = ''; })
+		createtoolButton('皮肤').addEventListener('click', event => mask.style.display = 'block' )
 	}
 
 	if (!isPWA && !isTool) {
-		const bar = document.getElementById('tool-bar');
-		if (bar) {
-			const fullscreenBtn = bar.appendChild(document.createElement('a'));
-			fullscreenBtn.className = "fullscreen btn";
-			fullscreenBtn.href = "#main";
-			fullscreenBtn.innerText = '全屏';
-			fullscreenBtn.addEventListener('click', event => {
-				const fullscreenElement =
-					document.fullscreenElement
-					|| document.mozFullscreenElement
-					|| document.webkitFullscreenElement;
-				if (fullscreenElement) {
-					if (fullscreenElement.exitFullscreen) {
-						fullscreenElement.exitFullscreen();
-					} else if (fullscreenElement.mozCancelFullScreen) {
-						fullscreenElement.mozCancelFullScreen();
-					} else if (fullscreenElement.webkitCancelFullScreen) {
-						fullscreenElement.webkitCancelFullScreen();
-					} else if (document.exitFullscreen) {
-						document.exitFullscreen();
-					} else if (document.mozCancelFullScreen) {
-						document.mozCancelFullScreen();
-					} else if (document.webkitCancelFullScreen) {
-						document.webkitCancelFullScreen();
-					}
-					return;
+		createtoolButton('全屏').addEventListener('click', event => {
+			const fullscreenElement =
+				document.fullscreenElement
+				|| document.mozFullscreenElement
+				|| document.webkitFullscreenElement;
+			if (fullscreenElement) {
+				if (fullscreenElement.exitFullscreen) {
+					fullscreenElement.exitFullscreen();
+				} else if (fullscreenElement.mozCancelFullScreen) {
+					fullscreenElement.mozCancelFullScreen();
+				} else if (fullscreenElement.webkitCancelFullScreen) {
+					fullscreenElement.webkitCancelFullScreen();
+				} else if (document.exitFullscreen) {
+					document.exitFullscreen();
+				} else if (document.mozCancelFullScreen) {
+					document.mozCancelFullScreen();
+				} else if (document.webkitCancelFullScreen) {
+					document.webkitCancelFullScreen();
 				}
-				const main = document.getElementById('main');
-				if (!main) { return; }
-				if (main.requestFullscreen) {
-					main.requestFullscreen();
-				} else if (main.mozRequestFullScreen) {
-					main.mozRequestFullScreen();
-				} else if (element.webkitRequestFullScreen) {
-					main.webkitRequestFullScreen();
-				}
-			})
-		}
+				return;
+			}
+			const main = document.getElementById('main');
+			if (!main) { return; }
+			if (main.requestFullscreen) {
+				main.requestFullscreen();
+			} else if (main.mozRequestFullScreen) {
+				main.mozRequestFullScreen();
+			} else if (element.webkitRequestFullScreen) {
+				main.webkitRequestFullScreen();
+			}
+		})
 	}
-
 });

@@ -1,4 +1,4 @@
-
+import {generateThemeStyle} from '../index.js';
 
 function getSize(size) {
 	if (size < 1024) {
@@ -50,7 +50,7 @@ export default class ImageSize extends HTMLElement {
 	li .info { display: flex; height: 20px; line-height: 20px; }
 	li .info * { flex: 1; }
 	form { margin: 0; height: 40px; line-height: 40px; display: flex; }
-	form select, form input{ flex: 1; width: 0; height: 40px; margin: 0; box-sizing: border-box; }
+	form select, form input{ border: 1px solid; flex: 1; width: 0; height: 40px; margin: 0; box-sizing: border-box; }
 	form label{ line-height: 20px; width: 20px; font-size: 14px; text-align: center; }
 	form select[name=mime] { max-width: 60px; }
 	.buttons { display: flex; height: 40px; line-height: 40px; }
@@ -58,49 +58,13 @@ export default class ImageSize extends HTMLElement {
 	.buttons .selectAll{ flex: none; width: 40px; height: 40px; margin: 0; }
 	#show-plyer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); }
 	#show-plyer img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; max-height: 80%; max-width: 80%; }
-	:host {
-		color: var(--themeused-text-color);
-		border-color: var(--themeused-border-color);
-		background-color: var(--themeused-background-color);
-	}
-	button {
-		border: 1px solid;
-		color: var(--themeused-button-text-color);
-		border-color: var(--themeused-button-border-color);
-		background-color: var(--themeused-button-background-color);
-	}
-	button:hover {
-		color: var(--themeused-button-text-color-hover);
-		border-color: var(--themeused-button-border-color-hover);
-		background-color: var(--themeused-button-background-color-hover);
-	}
-	input, select {
-		border: 1px solid;
-		color: var(--themeused-input-text-color);
-		border-color: var(--themeused-input-border-color);
-		background-color: var(--themeused-input-background-color);
-	}
-	input:hover, select:hover {
-		color: var(--themeused-input-text-color-hover);
-		border-color: var(--themeused-input-border-color-hover);
-		background-color: var(--themeused-input-background-color-hover);
-	}
-	li > div {
-		color: var(--themeused-item-text-color);
-		border-color: var(--themeused-item-border-color);
-		background-color: var(--themeused-item-background-color);
-	}
-	li > div:hover {
-		color: var(--themeused-item-text-color-hover);
-		border-color: var(--themeused-item-border-color-hover);
-		background-color: var(--themeused-item-background-color-hover);
-	}
-	#show-plyer {
-		background-color: var(--themeused-mask-background-color);
-	}
-	#show-plyer:hover {
-		background-color: var(--themeused-mask-background-color-hover);
-	}
+	button { border: 1px solid; }
+	${generateThemeStyle(':host')}
+	${generateThemeStyle('button', 'button')}
+	${generateThemeStyle('input', 'input')}
+	${generateThemeStyle('select', 'input')}
+	${generateThemeStyle('li > div', 'item')}
+	${generateThemeStyle('#show-plyer', 'mask')}
 </style>
 <div class="buttons">
 	<button class="selectImage">选择图片</button>

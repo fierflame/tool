@@ -1,3 +1,4 @@
+import {generateThemeStyle} from '../index.js';
 import createQrcodeMap from '../util/qrcode.js'
 
 export default class Qrcode extends HTMLElement {
@@ -30,8 +31,15 @@ export default class Qrcode extends HTMLElement {
 	@media (min-width:600px) { :host { --width: 180px; } }
 	@media (min-width:800px) { :host { --width: 240px; } }
 	@media (min-width:1000px) { :host { --width: 300px; } }
-	#showLayer { display: none; position: absolute; background: rgba(0,0,0,0.5); top: 0; left: 0; right: 0; bottom: 0; }
+	#showLayer { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
 	#showLayer img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; max-width: 90%; max-height: 90%; }
+	input, button { border: 1px solid; }
+	${generateThemeStyle(':host')}
+	${generateThemeStyle('button', 'button')}
+	${generateThemeStyle('input', 'input')}
+	${generateThemeStyle('textarea', 'input')}
+	${generateThemeStyle('select', 'input')}
+	${generateThemeStyle('#showLayer', 'mask')}
 </style>
 <div id="selector">
 	<span data-type-id="text">文本</span>
