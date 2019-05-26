@@ -51,7 +51,7 @@ ${generateThemeStyle('li', 'item')}
 	selectFile() {
 		const fileSelecter = document.createElement('input');
 		fileSelecter.type = "file";
-		// fileSelecter.multiple = true;
+		fileSelecter.multiple = true;
 		fileSelecter.addEventListener('change', () => {
 			for (let file of fileSelecter.files) {
 				this.encodeFile(file);

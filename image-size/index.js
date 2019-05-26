@@ -268,7 +268,7 @@ export default class ImageSize extends HTMLElement {
 	selectImage() {
 		const fileSelecter = document.createElement('input');
 		fileSelecter.type = "file";
-		// fileSelecter.multiple = true;
+		fileSelecter.multiple = true;
 		fileSelecter.accept = mime.join(',');
 		fileSelecter.addEventListener('change', () => {
 			for (let file of fileSelecter.files) {
