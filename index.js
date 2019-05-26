@@ -210,7 +210,7 @@ const themes = {
 		titleTextColor: '#69E',
 		explainTextColor: '#999',
 
-		buttonTextColor: '#00F',
+		buttonTextColor: '#99F',
 		buttonBackgroundColorHover: '#444',
 		inputBackgroundColorHover: '#444',
 		itemBackgroundColorHover: '#444',
