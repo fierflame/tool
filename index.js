@@ -1,6 +1,5 @@
-
 import list from './list.js';
-
+import SelectList from './component/select-list.js';
 /**
  * 系统相关配置
  * @var path 系统的路径
@@ -101,11 +100,23 @@ export function showComponent(id, title) {
 	}
 }
 
+const selectListTagName = registerComponent(SelectList);
 /**
  * 主题切换管理函数
  */
 
-export function generateThemeStyle(selector = '', type = '', posterity = ''){
+export function getThemeStyleText(type = '', e = ''){
+	if (type === 'default') { type = ''; }
+	type = type.replace(/\-+/g, '').replace(/([A-Z])/g, '-$1').toLowerCase();
+	if (type && type[0] !== '-') { type = '-' + type; }
+	if (e) { e = '-' + e; }
+	return `
+	color: var(--themeused${type}-text-color${e})!important;
+	border-color: var(--themeused${type}-border-color${e})!important;
+	background-color: var(--themeused${type}-background-color${e})!important;
+`
+}
+export function generateThemeStyle(selector = '', type = '', posterity = '') {
 	selector = selector.replace(/\s+$/, '');
 	if (type === 'default') { type = ''; }
 	type = type.replace(/\-+/g, '').replace(/([A-Z])/g, '-$1').toLowerCase();
@@ -158,12 +169,12 @@ export function getThemeStyle(themeInfoList, theme) {
 		const extend = [name, ...(item.extends || [])];
 		let baseValue, hoverValue, focusValue;
 		for (let name of extend) {
-			baseValue = baseValue || getValue(theme, name, type, 'inherit');
+			baseValue = baseValue || getValue(theme, name, type);
 			hoverValue = hoverValue || getValue(theme, name, type + 'Hover') || baseValue;
 			focusValue = focusValue || getValue(theme, name, type + 'Focus') || hoverValue;
 			if (baseValue && hoverValue && focusValue) { break; }
 		}
-		baseValue = baseValue || getDefaultValue(info, name, type);
+		baseValue = baseValue || getDefaultValue(info, name, type, 'inherit');
 		hoverValue = hoverValue || getDefaultValue(info, name, type + 'Hover', baseValue);
 		focusValue = focusValue || getDefaultValue(info, name, type + 'Focus', hoverValue);
 
@@ -194,7 +205,7 @@ const themeInfoList = {
 	'title': {title: '默认标题', extends: ['default'], value: { textColor: '#69E', }},
 	'explain': {title: '默认说明', extends: ['default'], value: { textColor: '#999', }},
 	'button': {title: '按钮', extends: ['default'], valueExtends: { borderColor: 'default', }, value: { textColor: '#00F', backgroundColorHover: '#DDD', }},
-	'input': {title: '输入框', extends: ['default'], valueExtends: { textColor: 'default', borderColor: 'default', }, value: { backgroundColorHover: '#DDD', }},
+	'input': {title: '输入框', extends: ['default'], valueExtends: { textColor: 'default', borderColor: 'default', backgroundColorHover: 'default',}, value: { }},
 	'mask': {title: '遮罩层', extends: [], value: { textColor: '#DDD', borderColor: 'rgba(0,0,0, 0.5)', backgroundColor: 'rgba(0,0,0, 0.5)', }},
 	'item': {title: '项目', extends: ['default'], valueExtends: { borderColor: 'default', }, value: { backgroundColorHover: '#DDD', }},
 	'itemTitle': {title: '项目标题', extends: ['item', 'title', 'default'], valueExtends:{ textColor: 'title', }, value: { borderColor: 'inherit', backgroundColor: 'inherit', }},
@@ -202,7 +213,7 @@ const themeInfoList = {
 };
 
 const themes = {
-	default: {},
+	bright: {},
 	dark: {
 		textColor: '#CCC',
 		borderColor: '#999',
@@ -212,7 +223,6 @@ const themes = {
 
 		buttonTextColor: '#99F',
 		buttonBackgroundColorHover: '#444',
-		inputBackgroundColorHover: '#444',
 		itemBackgroundColorHover: '#444',
 	}
 }
@@ -224,7 +234,7 @@ export function setStyle(theme, element = document.getElementsByTagName('html')[
 		element.style.setProperty(k, list[k]);
 	}
 }
-let currentTheme = localStorage.getItem('xutools-theme') || 'default';
+let currentTheme = localStorage.getItem('xutools-theme') || 'bright';
 export function switchTheme(theme, temp = false) {
 	if(!temp) {
 		currentTheme = theme;
@@ -242,71 +252,6 @@ export function switchTheme(theme, temp = false) {
 export const themeList = Object.keys(themes);
 switchTheme(currentTheme);
 
-/**
- * 主题组件
- */
-export class Theme extends HTMLElement {
-	constructor() {
-		super();
-		let shadow = this.attachShadow({mode:'open'});
-		this._shadow = shadow;
-		shadow.innerHTML = `
-			<style>
-			:host {
-				display: flex;
-			}
-			ul {
-				flex: 1;
-				list-style: none;
-				margin: 0;
-				padding: 0;
-				overflow: hidden;
-			}
-			ul::before {
-				content: '主题列表'
-			}
-			ul::after {
-				content: '更多主题敬请期待'
-			}
-			ul::before，ul::after {
-				height: 20px;
-				box-sizing: content-box;
-				line-height: 20px;
-				padding: 5px;
-				border-radius: 5px;
-				margin: 5px;
-			}
-			li {
-				height: 20px;
-				box-sizing: content-box;
-				line-height: 20px;
-				padding: 5px;
-				border: 1px solid;
-				border-radius: 5px;
-				margin: 5px;
-			}
-			${generateThemeStyle(':host')};
-			${generateThemeStyle('li', 'item')};
-			</style>
-			<ul></ul>`
-			this.update();
-	}
-	update() {
-		const list = this._shadow.querySelector('ul');
-		list.innerHTML = '';
-		themeList.forEach(theme => {
-			const li = list.appendChild(document.createElement('li'));
-			li.innerText = theme;
-			li.addEventListener('click', x => {
-				switchTheme(theme);
-				this.dispatchEvent(new Event('close'))
-			})
-			li.addEventListener('mouseenter', x => switchTheme(theme, true))
-			li.addEventListener('mouseleave', x => switchTheme(currentTheme))
-		})
-	}
-}
-const themeTagName = registerComponent(Theme);
 /**
  * 首页组件
  */
@@ -355,6 +300,11 @@ function createMask() {
 	})
 	return mask;
 }
+function creatSelectList() {
+	const selectList = document.getElementById('main').appendChild(document.createElement(selectListTagName));
+	selectList.className = 'select-list';
+	return selectList;
+}
 function createtoolButton(text) {
 	const btn = document.getElementById('tool-bar').appendChild(document.createElement('a'));
 	btn.className = "btn";
@@ -392,10 +342,20 @@ window.addEventListener('load', x => {
 	const toolBar = document.getElementById('tool-bar');
 	if (!toolBar) { return; }
 	if (!isTool) {
-		const mask = createMask();
-		const theme = mask.appendChild(document.createElement(themeTagName));
-		theme.addEventListener('close', x => {mask.style.display = ''; })
-		createtoolButton('皮肤').addEventListener('click', event => mask.style.display = 'block' )
+		const themeSelectList = creatSelectList();
+		themeSelectList.list = themeList.map(title => ({title}));
+		themeSelectList.style.display = 'none';
+		themeSelectList.placeholder = '选择主题(按上下箭头键预览)'
+		themeSelectList.addEventListener('itemfocus', ({value: {title}}) => switchTheme(title, true))
+		themeSelectList.addEventListener('itemblur', x => switchTheme(currentTheme))
+		themeSelectList.addEventListener('itemselect', ({value: {title}}) => { switchTheme(title); themeSelectList.style.display = 'none'; })
+		themeSelectList.addEventListener('exit', x => {switchTheme(currentTheme); themeSelectList.style.display = 'none'; })
+		createtoolButton('皮肤').addEventListener('click', event => {
+			themeSelectList.style.display = 'block';
+			themeSelectList.value = '';
+			themeSelectList.index = themeList.indexOf(currentTheme);
+			setTimeout(x => themeSelectList.focus(), 0);
+	} )
 	}
 
 	if (!isPWA && !isTool) {
@@ -426,9 +386,10 @@ window.addEventListener('load', x => {
 				main.requestFullscreen();
 			} else if (main.mozRequestFullScreen) {
 				main.mozRequestFullScreen();
-			} else if (element.webkitRequestFullScreen) {
+			} else if (main.webkitRequestFullScreen) {
 				main.webkitRequestFullScreen();
 			}
+
 		})
 	}
 });

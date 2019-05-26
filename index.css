@@ -237,7 +237,7 @@ main {
 	color: var(--themeused-item-explain-text-color-hover)!important;
 }
 
-
+.select-list { position: absolute; width: 600px; max-width: 80%; margin: auto; left: 0; right: 0; top: 40px; }
 .mask { display: none; position: absolute; top: 0; left: 0; right: 0; bottom: 0; }
 .mask > * { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; max-height: 80%; max-width: 80%; padding: 10px; border-radius: 10px; }
 
