@@ -24,7 +24,7 @@ function getSize(size) {
 	}
 }
 
-const mime = ['image/png','image/jpeg','image/bmp','image/svg+xml'];
+const mime = ['image/png','image/jpeg','image/bmp','image/webp','image/svg+xml'];
 export default class ImageSize extends HTMLElement {
 	constructor() {
 		super();
@@ -91,6 +91,7 @@ export default class ImageSize extends HTMLElement {
 	<select name="mime">
 		<option value="image/png">png</option>
 		<option value="image/jpeg">jpg</option>
+		<option value="image/webp">webp</option>
 	</select>
 </form>
 <div class="buttons">

@@ -104,6 +104,7 @@ export default class Qrcode extends HTMLElement {
 		<label>类　型<select name="mime">
 			<option value="image/png">png</option>
 			<option value="image/jpeg">jpg</option>
+			<option value="image/webp">webp</option>
 			<option value="image/svg+xml">svg</option>
 		</select></label>
 		<button id="show">查看二维码</button>
