@@ -1,9 +1,9 @@
 const baseItemVersion = 3;
 const itemVersion = {
 	'base64/index.js': 1,
-	'file2base64/index.js': 1,
-	'image-size/index.js': 1,
-	'qrcode/index.js': 1,
+	'file2base64/index.js': 2,
+	'image-size/index.js': 2,
+	'qrcode/index.js': 2,
 };
 const baseItem = [ './index/index.html', './pwa/index.html', './xutool/index.html', './index.js', './index.css',];
 baseItem.forEach(it => itemVersion[it] = baseItemVersion);
