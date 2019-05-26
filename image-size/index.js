@@ -241,7 +241,7 @@ export default class ImageSize extends HTMLElement {
 	download(url, name) {
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = ((name || '').replace(/\.[^\.]*$/, '') || '图片') + '.jpg';
+		a.download = (name || '').replace(/\..*$/, '') || '图片';
 		a.click();
 	}
 	updateSelectAll() {
