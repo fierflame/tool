@@ -115,17 +115,16 @@ export default class ImageSize extends HTMLElement {
 		this._mime = form.mime;
 		const selectAll = shadow.querySelectorAll('.selectAll');
 		this._selectAll = selectAll;
-		selectAll.forEach(it => it.addEventListener('click', x=> {
-			const checked = selectAll[0].checked;
-			Array.from(this._shadow.querySelectorAll('input[type=checkbox]')).forEach(it => it.checked = checked);
+		selectAll.forEach(it => it.addEventListener('click', function() {
+			Array.from(shadow.querySelectorAll('input[type=checkbox]')).forEach(it => it.checked = this.checked);
 		}))
 		shadow.querySelectorAll('.delete').forEach(it => it.addEventListener('click', x=> {
-			Array.from(this._shadow.querySelectorAll('input[type=checkbox]'))
+			Array.from(shadow.querySelectorAll('input[type=checkbox]'))
 				.filter(it => it.checked)
 				.forEach(it => it.parentElement.dispatchEvent(new Event('requesDelete')))
 		}))
 		shadow.querySelectorAll('.download').forEach(it => it.addEventListener('click', x=> {
-			Array.from(this._shadow.querySelectorAll('input[type=checkbox]'))
+			Array.from(shadow.querySelectorAll('input[type=checkbox]'))
 				.filter(it => it.checked)
 				.forEach(it => it.parentElement.dispatchEvent(new Event('requestDownload')))
 		}))
