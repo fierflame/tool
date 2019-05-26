@@ -245,7 +245,7 @@ export function switchTheme(theme, temp = false) {
 	} else if (theme in themes) {
 		theme = themes[theme];
 	} else {
-		theme = '';
+		theme = {};
 	}
 	setStyle(theme);
 }
