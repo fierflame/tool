@@ -1,4 +1,4 @@
-const baseItemVersion = 5;
+const baseItemVersion = 6;
 const itemVersion = {
 	'base64/index.js': 1,
 	'file2base64/index.js': 2,

@@ -1,5 +1,5 @@
 import list from './list.js';
-import SelectList from './component/select-list.js';
+import SelectList, {Item as SelectListItem} from './component/select-list.js';
 /**
  * 系统相关配置
  * @var path 系统的路径
@@ -101,6 +101,7 @@ export function showComponent(id, title) {
 }
 
 const selectListTagName = registerComponent(SelectList);
+const selectListItemTagName = registerComponent(SelectListItem);
 /**
  * 主题切换管理函数
  */
@@ -300,9 +301,13 @@ function createMask() {
 	})
 	return mask;
 }
-function creatSelectList() {
+function creatSelectList(placeholder) {
 	const selectList = document.getElementById('main').appendChild(document.createElement(selectListTagName));
 	selectList.className = 'select-list';
+	selectList.placeholder = placeholder || '';
+	selectList.style.display = 'none';
+	selectList.addEventListener('exit', x => selectList.style.display = 'none');
+	selectList.addEventListener('change', x => selectList.style.display = 'none');
 	return selectList;
 }
 function createtoolButton(text) {
@@ -342,20 +347,26 @@ window.addEventListener('load', x => {
 	const toolBar = document.getElementById('tool-bar');
 	if (!toolBar) { return; }
 	if (!isTool) {
-		const themeSelectList = creatSelectList();
-		themeSelectList.list = themeList.map(title => ({title}));
-		themeSelectList.style.display = 'none';
-		themeSelectList.placeholder = '选择主题(按上下箭头键预览)'
-		themeSelectList.addEventListener('itemfocus', ({value: {title}}) => switchTheme(title, true))
-		themeSelectList.addEventListener('itemblur', x => switchTheme(currentTheme))
-		themeSelectList.addEventListener('itemselect', ({value: {title}}) => { switchTheme(title); themeSelectList.style.display = 'none'; })
-		themeSelectList.addEventListener('exit', x => {switchTheme(currentTheme); themeSelectList.style.display = 'none'; })
-		createtoolButton('皮肤').addEventListener('click', event => {
+		let showThemeSelect = false;
+		const themeSelectList = creatSelectList('选择主题(按上下箭头键预览)');
+		themeList.forEach(theme => {
+			const item =document.createElement(selectListItemTagName)
+			item.title = theme;
+			item.addEventListener('focus', x => showThemeSelect && switchTheme(theme, true))
+			item.addEventListener('blur', x => showThemeSelect && switchTheme(currentTheme))
+			item.addEventListener('select', x => showThemeSelect && switchTheme(theme))
+			themeSelectList.appendChild(item);
+		})
+		themeSelectList.addEventListener('exit', x => showThemeSelect = false )
+		themeSelectList.addEventListener('change', x => showThemeSelect = false )
+		themeSelectList.addEventListener('exit', x => showThemeSelect && switchTheme(currentTheme) )
+		createtoolButton('主题').addEventListener('click', event => {
 			themeSelectList.style.display = 'block';
 			themeSelectList.value = '';
-			themeSelectList.index = themeList.indexOf(currentTheme);
+			showThemeSelect = true;
+			Array.from(themeSelectList.children).filter(it => it.title === currentTheme).forEach(it => it.focus());
 			setTimeout(x => themeSelectList.focus(), 0);
-	} )
+		})
 	}
 
 	if (!isPWA && !isTool) {
