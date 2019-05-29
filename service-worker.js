@@ -1,11 +1,21 @@
-const baseItemVersion = 6;
+const baseItemVersion = 7;
 const itemVersion = {
 	'base64/index.js': 1,
 	'file2base64/index.js': 2,
 	'image-size/index.js': 2,
 	'qrcode/index.js': 2,
 };
-const baseItem = [ './index/index.html', './pwa/index.html', './xutool/index.html', './index.js', './index.css',];
+const baseItem = [
+	'./index/index.html',
+	'./pwa/index.html',
+	'./xutool/index.html',
+	'./index.js',
+	'./component/select-list.js',
+	'./util/compenent.js',
+	'./util/key.js',
+	'./util/theme.js',
+	'./index.css',
+];
 baseItem.forEach(it => itemVersion[it] = baseItemVersion);
 
 
@@ -25,52 +35,46 @@ function getPageId(path) {
 	return toolId + '/';
 }
 function getItemId(path) {
-	let info = /^([a-z0-9\-]+\/index\.js)$/.exec(path);
-	if (info) { return info[1] || ''; }
-	info = /^((?:component|util)\/[a-z0-9\-]+\.js)$/.exec(path);
+	if (['index.json', 'favicon.ico', ].includes(path)) { return path; }
+	info = /^([a-z0-9\-\/]+\.js)$/.exec(path);
 	if (info) { return info[1] || ''; }
 	info = /^(logo\/(?:\d+\.png|logo\.svg))$/.exec(path);
-	if (info) { return info[1] || ''; }
-	info = /^(favicon\.ico)$/.exec(path);
-	if (info) { return info[1] || ''; }
-	info = /^(index\.json)$/.exec(path);
 	if (info) { return info[1] || ''; }
 }
 
 async function putItem(id, res, version = itemVersion[id] || 0) {
 	const data = await res.clone().blob();
-	res = new Response(data, {
+	const cache = await caches.open(cacheName);
+	cache.put(`./${id}`, new Response(data, {
 		headers: {
 			'Content-Type': data.type,
 			'Xu-Tools-Version': version,
 			'Content-Length': data.size,
 		}
-	})
-	let cache = await caches.open(cacheName)
-	cache.put(`./${id}`, res);
+	}));
 }
 async function backup(id, version = itemVersion[id]) {
-	const res = await fetch(`./${id}`);
+	const res = await fetch(`./${id}?_=${Number(new Date())}`);
 	if(res.status !== 200) { return res; }
 	putItem(id, res, version);
 	return res;
 }
-async function updateItem(id, oldRes, version = itemVersion[id]) {
+async function updateItem(id, oldRes, version = itemVersion[id] || 0) {
 	if (typeof version !== 'number') { return oldRes; }
 	if (oldRes && Number(oldRes.headers.get('Xu-Tools-Version') || 0) >= version) { return oldRes; }
 	try {
-		const res = await fetch(`./${id}`);
+		const res = await fetch(`./${id}?_=${Number(new Date())}`);
 		if(res.status !== 200) { return oldRes; }
 		putItem(id, res, version);
 		return res;
 	} catch(e) {
-		if (oldRes) { throw e; }
+		if (!oldRes) { throw e; }
 		return oldRes;
 	}
 
 }
 function updateList() {
-	setTimeout(updateList, 6 * 60 *60 * 1000);
+	setTimeout(updateList, 6 * 60 * 60 * 1000);
 	backup('./list.js');
 }
 
@@ -79,9 +83,8 @@ self.addEventListener('install', function(event) {
 	caches.delete('xutool-base-page')
 	caches.delete('xutool-item')
 	event.waitUntil(caches.open(cacheName)
-		.then(cache => Promise.all(
-			baseItem.map(async k => updateItem(k, await cache.match(k), baseItem[k]))
-		)).then(updateList)
+		.then(cache => Promise.all(baseItem.map(async k => updateItem(k, await cache.match(k)))))
+		.then(updateList)
 	);
 });
 self.addEventListener('activate', function(event) {updateList()});
@@ -108,6 +111,5 @@ self.addEventListener('fetch', function(event) {
 	}
 	if (itemId) {
 		return event.respondWith(caches.match(`./${itemId}`).then(res => res ? updateItem(itemId, res) : backup(itemId)));
-		
 	}
 });

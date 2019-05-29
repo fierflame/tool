@@ -1,5 +1,13 @@
 import list from './list.js';
+import { get as getKey, set as setKey, } from './util/key.js';
+import { load as loadComponent, register as registerComponent, create as createComponent, } from './util/compenent.js';
+import {getStyleText as getThemeStyleText, getVar as getThemeStyle} from './util/theme.js';
 import SelectList, {Item as SelectListItem} from './component/select-list.js';
+export { loadComponent, registerComponent, createComponent, };
+export { getThemeStyleText };
+const selectListTagName = registerComponent(SelectList);
+const selectListItemTagName = registerComponent(SelectListItem);
+
 /**
  * 系统相关配置
  * @var path 系统的路径
@@ -33,6 +41,18 @@ if ('serviceWorker' in navigator) { navigator.serviceWorker.register(path + 'ser
 /**
  * 页面路由
  */
+function showComponent(id, title) {
+	createComponent(id);
+	const main = document.getElementById('main');
+	const titleDiv = document.getElementById('title');
+	if (titleDiv) { titleDiv.innerText = title || '开发者工具'; }
+	const components = Array.from(document.getElementsByClassName('main'));
+	const component = document.createElement(`xutool-${id}`);
+	component.innerHTML = `<div class="loadding-box"><div class="loadding"></div><p>如果长时间未完成加载</p><p>可能是浏览器版本太低</p><p>请升级浏览器后再试</p></div>`
+	component.className = 'main';
+	main.insertBefore(component, components[0]);
+	components.forEach(c => main.removeChild(c));
+}
 /**
  * 跳转的指定工具
  * @param {string} id 工具Id
@@ -53,146 +73,16 @@ function gotoTool(id, title, replace = false) {
 window.addEventListener('popstate', ({state}) => state && state.id && showComponent(state.id, state.title));
 
 
-/**
- * 组件管理
- */
-const componentPromise = Object.create(null);
-const componentMap = new Map();
-const components = Object.create(null);
-export async function loadComponent(path) {
-	if (!path) { path = 'index'; }
-	if (path[path.length] === '/') { path += 'index'; }
-	if (path !== 'index' && /^[a-z0-9\-]+$/.test(path)) { path = path + '/index'; }
-	if (path.substr(path.length - 3) === '.js') { path = path.substr(0, path.length - 3); }
-	if (path in componentPromise) { return componentPromise[path]; }
-	return componentPromise[path] = import(`./${path}.js`).then(({default: def}) => def);
-}
-function getName(name = '') {
-	name = /^[a-z0-9\-]+$/.test(name) ? `xutool-${name}` : /^xutool-[a-z0-9]+$/.test(name) ? name : '';
-	while(components[name] || !name) {
-		name = `xutool-component-r${Math.floor(Math.random() * 100000000)}`
-	};
-	return name;
-}
-export function registerComponent(component, name) {
-	if (componentMap.has(component)) { return componentMap.get(component); }
-	name = getName(name);
-	components[name] = component;
-	componentMap.set(component, name);
-	customElements.define(name, component);
-	return name;
-}
-export async function createComponent(path) {
-	const component = await loadComponent(path);
-	return registerComponent(component, path);
-}
-export function showComponent(id, title) {
-	createComponent(id);
-	const main = document.getElementById('main');
-	document.getElementById('title').innerText = title || '开发者工具';
-	const components = Array.from(document.getElementsByClassName('main'));
-	const component = document.createElement(`xutool-${id}`);
-	component.innerHTML = `<div class="loadding-box"><div class="loadding"></div><p>如果长时间未完成加载</p><p>可能是浏览器版本太低</p><p>请升级浏览器后再试</p></div>`
-	component.className = 'main';
-	main.insertBefore(component, components[0])
-	for (let component of components) {
-		main.removeChild(component);
-	}
-}
 
-const selectListTagName = registerComponent(SelectList);
-const selectListItemTagName = registerComponent(SelectListItem);
 /**
  * 主题切换管理函数
  */
 
-export function getThemeStyleText(type = '', e = ''){
-	if (type === 'default') { type = ''; }
-	type = type.replace(/\-+/g, '').replace(/([A-Z])/g, '-$1').toLowerCase();
-	if (type && type[0] !== '-') { type = '-' + type; }
-	if (e) { e = '-' + e; }
-	return `
-	color: var(--themeused${type}-text-color${e})!important;
-	border-color: var(--themeused${type}-border-color${e})!important;
-	background-color: var(--themeused${type}-background-color${e})!important;
-`
-}
 export function generateThemeStyle(selector = '', type = '', posterity = '') {
 	selector = selector.replace(/\s+$/, '');
-	if (type === 'default') { type = ''; }
-	type = type.replace(/\-+/g, '').replace(/([A-Z])/g, '-$1').toLowerCase();
-	if (type && type[0] !== '-') { type = '-' + type; }
-	return `${selector} ${posterity} {
-		color: var(--themeused${type}-text-color)!important;
-		border-color: var(--themeused${type}-border-color)!important;
-		background-color: var(--themeused${type}-background-color)!important;
-	}
-	${selector}:hover ${posterity} {
-		color: var(--themeused${type}-text-color-hover)!important;
-		border-color: var(--themeused${type}-border-color-hover)!important;
-		background-color: var(--themeused${type}-background-color-hover)!important;
-	}
-	${selector}:focus ${posterity} {
-		color: var(--themeused${type}-text-color-focus)!important;
-		border-color: var(--themeused${type}-border-color-focus)!important;
-		background-color: var(--themeused${type}-background-color-focus)!important;
-	}`
-}
-export function getThemeStyle(themeInfoList, theme) {
-	function getStyleName(name, type) {
-		if (name === 'default') { name = ''; }
-		name = name.replace(/\-+/g, '').replace(/([A-Z])/g, '-$1').toLowerCase();
-		if (name && name[0] !== '-') { name = '-' + name; }
-		type = type.replace(/\-+/g, '').replace(/([A-Z])/g, '-$1').toLowerCase();
-		if (type && type[0] !== '-') { type = '-' + type; }
-		return `--themeused${name}${type}`;
-	}
-	function getValue(theme, name, type) {
-		if (name === 'default') { name = ''; }
-		const t = name ? name + type[0].toUpperCase() + type.substr(1) : type;
-		return t in theme ? theme[t] : '';
-	}
-	function getDefaultValue(info, name, type, def) {
-		let item = info[name];
-		if (!item) { return def; }
-		if (item.value && item.value[type]) {
-			return item.value[type];
-		} else if (item.valueExtends && item.valueExtends[type]){
-			let it = info[item.valueExtends[type]];
-			if (it && it.value && it.value[type]) {
-				return it.value[type];
-			}
-		}
-		return def;
-	}
-	function generateThemeTypeValueList(info, theme, name, type) {
-		let item = info[name];
-		const extend = [name, ...(item.extends || [])];
-		let baseValue, hoverValue, focusValue;
-		for (let name of extend) {
-			baseValue = baseValue || getValue(theme, name, type);
-			hoverValue = hoverValue || getValue(theme, name, type + 'Hover') || baseValue;
-			focusValue = focusValue || getValue(theme, name, type + 'Focus') || hoverValue;
-			if (baseValue && hoverValue && focusValue) { break; }
-		}
-		baseValue = baseValue || getDefaultValue(info, name, type, 'inherit');
-		hoverValue = hoverValue || getDefaultValue(info, name, type + 'Hover', baseValue);
-		focusValue = focusValue || getDefaultValue(info, name, type + 'Focus', hoverValue);
-
-		const styleName = getStyleName(name, type);
-		return {
-			[`${styleName}`]: baseValue,
-			[`${styleName}-hover`]: hoverValue,
-			[`${styleName}-focus`]: focusValue,
-		}
-	}
-	const style = Object.create({});
-	for (let name in themeInfoList) {
-		Object.assign(style, generateThemeTypeValueList(themeInfoList, theme, name, 'textColor'));
-		Object.assign(style, generateThemeTypeValueList(themeInfoList, theme, name, 'borderColor'));
-		Object.assign(style, generateThemeTypeValueList(themeInfoList, theme, name, 'backgroundColor'));
-	}
-	return style;
+	return `${selector} ${posterity} { ${getThemeStyleText(type)} }
+	${selector}:hover ${posterity} { ${getThemeStyleText(type, 'hover')} }
+	${selector}:focus ${posterity} { ${getThemeStyleText(type, 'focus')} }`
 }
 /**
  * 主题相关
@@ -301,13 +191,24 @@ function createMask() {
 	})
 	return mask;
 }
-function creatSelectList(placeholder) {
-	const selectList = document.getElementById('main').appendChild(document.createElement(selectListTagName));
+const selectLists = [];
+function creatSelectList(open, placeholder) {
+	if (typeof open === 'string' || placeholder === 'function') {
+		[open, placeholder] = [placeholder, open];
+	}
+	const selectList = document.createElement(selectListTagName);
 	selectList.className = 'select-list';
-	selectList.placeholder = placeholder || '';
-	selectList.style.display = 'none';
-	selectList.addEventListener('exit', x => selectList.style.display = 'none');
-	selectList.addEventListener('change', x => selectList.style.display = 'none');
+	selectList.placeholder = typeof placeholder === 'string'  && placeholder || '';
+	selectList.open = function() {
+		selectLists.forEach(it => it.remove() );
+		document.getElementById('main').appendChild(selectList);
+		setTimeout(x => selectList.focus(), 0);
+		if (typeof open === 'function') { open(selectList); }
+	};
+	selectList.close = function() { this.remove(); };
+	selectList.addEventListener('cancel', x => selectList.close());
+	selectList.addEventListener('change', x => selectList.close());
+	selectLists.push(selectList);
 	return selectList;
 }
 function createtoolButton(text) {
@@ -346,27 +247,49 @@ window.addEventListener('load', x => {
 
 	const toolBar = document.getElementById('tool-bar');
 	if (!toolBar) { return; }
+	const cmdSelectList = creatSelectList('选择主题(按上下箭头键预览)');
+	setKey('Shift + Ctrl + P', 'panel');
+	document.addEventListener('keydown', event => {
+		const cmd = getKey(event);
+		if (!cmd) { return; }
+		const evt = new Event('keycmd', {composed: true, bubbles: true, cancelable: true});
+		evt.cmd = cmd;
+		evt.repeat = event.repeat;
+		if (event.path[0].dispatchEvent(evt)) { return; }
+		event.preventDefault();
+		event.stopPropagation();
+	}, true);
+	document.addEventListener('keycmd', ({cmd, repeat}) => {
+		if (cmd === 'panel') {
+			cmdSelectList.open();
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	}, true);
+
 	if (!isTool) {
 		let showThemeSelect = false;
-		const themeSelectList = creatSelectList('选择主题(按上下箭头键预览)');
+		const themeSelectList = creatSelectList('选择主题(按上下箭头键预览)',x => {
+			themeSelectList.value = '';
+			showThemeSelect = true;
+			Array.from(themeSelectList.children).filter(it => it.title === currentTheme).forEach(it => it.focus());
+		});
 		themeList.forEach(theme => {
-			const item =document.createElement(selectListItemTagName)
+			const item = document.createElement(selectListItemTagName);
 			item.title = theme;
 			item.addEventListener('focus', x => showThemeSelect && switchTheme(theme, true))
 			item.addEventListener('blur', x => showThemeSelect && switchTheme(currentTheme))
 			item.addEventListener('select', x => showThemeSelect && switchTheme(theme))
 			themeSelectList.appendChild(item);
 		})
-		themeSelectList.addEventListener('exit', x => showThemeSelect = false )
+		themeSelectList.addEventListener('cancel', x => showThemeSelect = false )
 		themeSelectList.addEventListener('change', x => showThemeSelect = false )
-		themeSelectList.addEventListener('exit', x => showThemeSelect && switchTheme(currentTheme) )
-		createtoolButton('主题').addEventListener('click', event => {
-			themeSelectList.style.display = 'block';
-			themeSelectList.value = '';
-			showThemeSelect = true;
-			Array.from(themeSelectList.children).filter(it => it.title === currentTheme).forEach(it => it.focus());
-			setTimeout(x => themeSelectList.focus(), 0);
-		})
+		themeSelectList.addEventListener('cancel', x => showThemeSelect && switchTheme(currentTheme) )
+		createtoolButton('主题').addEventListener('click', event => themeSelectList.open());
+		const cmdItem = document.createElement(selectListItemTagName);
+		cmdItem.title = '首选项: 颜色皮肤';
+		cmdItem.addEventListener('click', x => themeSelectList.open());
+		cmdSelectList.appendChild(cmdItem);
 	}
 
 	if (!isPWA && !isTool) {

@@ -9,7 +9,7 @@ export default class SelectList extends HTMLElement {
 			:host { border: 1px solid; }
 			input { box-sizing: border-box; border: none; border-bottom: 1px solid; height: 30px; margin: 0; padding: 0 5px; outline: none; width: 100%; }
 			ul { position: relative; max-height: 320px; overflow: auto; margin: 0; padding: 0; }
-			li { display: none; }
+			li { display: none; cursor: pointer; }
 			.show { display: block; }
 			.selected { background: #DDD; }
 			li * { height: 20px; line-height: 16px; margin: 0; padding: 0; overflow: hidden; white-space:nowrap; text-overflow: ellipsis; }
@@ -37,7 +37,7 @@ export default class SelectList extends HTMLElement {
 			} else if (event.key === 'Enter') {
 				this._enter();
 			} else if (event.key === 'Escape') {
-				this.dispatchEvent(new Event('exit'));
+				this.dispatchEvent(new Event('cancel'));
 			} else {
 				return;
 			}
@@ -46,18 +46,35 @@ export default class SelectList extends HTMLElement {
 		});
 		this._re = /.?/i;
 		input.addEventListener('input', event => this.input());
-		this._mutationObserver = new MutationObserver(t => this.update(t))
-		this._item2liMap = new Map();
-		this._li2itemMap = new Map();
-		this.update();
+		input.addEventListener('input', event => this.dispatchEvent(new Event('input')));
+		this._mutationObserver = new MutationObserver(list => {
+			const ul = this.shadowRoot.querySelector('ul');
+			for (let {addedNodes, nextSibling, removedNodes} of list) {
+				let nextli;
+				if (nextSibling) { nextli = nextSibling._li; }
+				for (let item of addedNodes) {
+					const li = item._li;
+					if (nextli) {
+						ul.insertBefore(li, nextli);
+					} else {
+						ul.appendChild(li);
+					}
+					this._updateShow(li);
+					if (this.shadowRoot.querySelectorAll('li.selected').length > 2) {
+						li.classList.remove('selected');
+					}
+				}
+				for (let item of removedNodes) {
+					item._li.remove();
+				}
+			}
+			this._updateSelect();
+			this.dispatchEvent(new Event('update'));
+		})
 		this._mutationObserver.observe(this, {childList: true})
 	}
-	get placeholder() {
-		return this.getAttribute('placeholder');
-	}
-	set placeholder(placeholder) {
-		return this.setAttribute('placeholder', placeholder);
-	}
+	get placeholder() { return this.getAttribute('placeholder'); }
+	set placeholder(placeholder) { return this.setAttribute('placeholder', placeholder); }
 	get value() {
 		return this._input.value;
 	}
@@ -66,34 +83,13 @@ export default class SelectList extends HTMLElement {
 		newValue = String(newValue);
 		if (newValue === input.value) { return; }
 		input.value = newValue;
-		this.input();
-	}
-	get index() {
-		let selected = this.shadowRoot.querySelector('li.selected');
-		if (!selected) { return -1; }
-		return Number(selected.dataset.id);
-	}
-	set index(index) {
-		let list = Array.from(this.shadowRoot.querySelectorAll('li'));
-		if (!list.length) { return; }
-		index = parseInt(index) || 0;
-		if (index < 0) { index = 0; }
-		if (index >= list.length) { index = list.length - 1; }
-		let item = list[index];
-		if (item.classList.contains('show')) {
-			this._focus(item);
-			return;
-		}
-		this._blur();
-		item = this.shadowRoot.querySelector(`li:nth-child(${index}) ~ li.show`);
-		if (!item) { item = Array.from(this.shadowRoot.querySelectorAll('li.show')).pop(); }
-		this._focus(item);
+		this._input();
 	}
 	_enter() {
-		let selected = this.shadowRoot.querySelector('li.selected');
-		if (!selected) { return false; }
-		const item = this._li2itemMap.get(selected);
-		if (item) { item.dispatchEvent(new Event('select')); }
+		const item = this.shadowRoot.querySelector('li.selected')._SLItem;
+		if (!item) { return false; }
+		item.dispatchEvent(new Event('select'));
+		item.dispatchEvent(new Event('click'));
 		this.dispatchEvent(new Event('change'));
 		return true;
 	}
@@ -102,28 +98,25 @@ export default class SelectList extends HTMLElement {
 		if (!li) { return false; }
 		if(!li.classList.contains('selected')) { return false; }
 		li.classList.remove('selected');
-		const item = this._li2itemMap.get(li);
-		if (item) { item.dispatchEvent(new Event('blur')); }
+		const item = li._SLItem;
+		if (!item) { return false; }
+		item.dispatchEvent(new Event('blur'));
 		return true;
 	}
 	_focus(li) {
 		if (!li) { return false; }
 		if (li.classList.contains('selected')) { return this.show(li); }
+		const item = li._SLItem;
+		if (!item) { return false; }
 		this._blur();
 		li.classList.add('selected');
 		this.show(li);
-		const item = this._li2itemMap.get(li);
-		if (item) { item.dispatchEvent(new Event('focus')); }
+		item.dispatchEvent(new Event('focus'));
 		return true;
 	}
-	focus() {
-		super.focus();
-		this._input.focus();
-	}
+	focus() { this._input.focus(); }
 	show(li) {
-		if (li instanceof Item) {
-			return this._focus(this._item2liMap.get(li));
-		}
+		if (li instanceof Item) { return this._focus(li._li); }
 		if (!li) { return false; }
 		const ul = this.shadowRoot.querySelector('ul');
 		if (ul.scrollTop + ul.clientHeight < li.offsetTop + li.clientHeight) {
@@ -134,49 +127,8 @@ export default class SelectList extends HTMLElement {
 		}
 		return true;
 	}
-	update(item) {
-		if (item instanceof Item) {
-			const li = this._item2liMap.get(li);
-			if (!li) { return; }
-			const { title, explain } = item;
-			li.innerHTML = '';
-			li.appendChild(document.createElement('h2')).innerText = title;
-			if (explain) { li.appendChild(document.createElement('p')).innerText = explain; }
-			this._updateShow(li);
-			this._updateSelect(li);
-			return;
-		}
-		const ul = this.shadowRoot.querySelector('ul');
-		ul.innerHTML = '';
-		const items = Array.from(this.children).filter(it => it instanceof Item);
-		let item2liMap = this._item2liMap;
-		let li2itemMap = this._li2itemMap;
-		for (let [item, li] of [...item2liMap]) {
-			if (items.includes(item)) { continue; }
-			item2liMap.item2liMap(item);
-			li2itemMap.item2liMap(li);
-		}
-		items.forEach(item => {
-			let li = item2liMap.get(item);
-			if (!li) {
-				li = document.createElement('li');
-				item2liMap.set(item, li);
-				li2itemMap.set(li, item);
-				li.addEventListener('mouseenter', x => this.set(li));
-				li.addEventListener('click', x => this._enter(li));
-				const { title, explain } = item;
-				li.appendChild(document.createElement('h2')).innerText = title;
-				if (explain) { li.appendChild(document.createElement('p')).innerText = explain; }
-				this._updateShow(li);
-			}
-			ul.appendChild(li);
-		})
-		this._updateSelect();
-
-		this.dispatchEvent(new Event('update'));
-	}
 	_updateShow(li) {
-		if (this._re.test(li.innerText.replace(/\s+/g, ' '))) {
+		if (!li.hidden && this._re.test(li.innerText.replace(/\s+/g, ' '))) {
 			li.classList.add('show');
 		} else {
 			li.classList.remove('show');
@@ -206,9 +158,6 @@ export default class SelectList extends HTMLElement {
 		}
 		this._updateSelect();
 	}
-	set(li) {
-		this._focus(li);
-	}
 	next(isUp) {
 		if (!this.shadowRoot.querySelector('li.show')) { return; }
 		const list = Array.from(this.shadowRoot.querySelectorAll('li.show, li.selected'));
@@ -235,31 +184,73 @@ export default class SelectList extends HTMLElement {
 
 
 export class Item extends HTMLElement {
-	static get observedAttributes() { return ['title', 'explain']; }
+	static get observedAttributes() { return ['title', 'explain', 'hidden']; }
 	constructor() {
 		super();
+		const li = document.createElement('li');
+		const titleEle = document.createElement('h2');
+		li.appendChild(titleEle);
+		const explainEle = document.createElement('p');
+		this._title = titleEle;
+		this._explain = explainEle;
+		this._li = li;
+		li.addEventListener('mouseenter', x => this.focus());
+		li.addEventListener('click', x => this.click());
+		li._SLItem = this;
+	}
+	click() {
+		const parent = this.parentNode;
+		if (!(parent instanceof SelectList)) { return; }
+		parent._enter();
 	}
 	focus() {
 		const parent = this.parentNode;
 		if (!(parent instanceof SelectList)) { return false; }
 		return parent.show(this);
 	}
-	get title() {
-		return this.getAttribute('title');
-	}
-	set title(title) {
-		return this.setAttribute('title', title);
-	}
-	get explain() {
-		return this.getAttribute('explain');
-	}
-	set explain(explain) {
-		return this.setAttribute('explain', explain);
+	get title() { return this.getAttribute('title') || ''; }
+	set title(title) { this.setAttribute('title', title || ''); }
+	get explain() { return this.getAttribute('explain') || ''; }
+	set explain(explain) { this.setAttribute('explain', explain || ''); }
+	get hidden() { return this._li.hidden; }
+	set hidden(hidden) {
+		this._li.hidden = hidden;
+		hidden = this._li.getAttribute('hidden');
+		if (hidden === null) {
+			this.removeAttribute('hidden');
+		} else {
+			this.setAttribute('hidden', hidden);
+		}
 	}
 	attributeChangedCallback(attrName, oldVal, newVal, ...p){
 		if (oldVal === newVal) { return; }
+		switch(attrName) {
+			case 'title': {
+				this._title.innerText = newVal || '';
+				break;
+			}
+			case 'explain': {
+				this._explain.innerText = newVal || '';
+				if (newVal) {
+					this._li.appendChild(this._explain);
+				} else {
+					this._explain.remove();
+				}
+				break;
+			}
+			case 'hidden': {
+				if (newVal === null) {
+					this._li.removeAttribute('hidden');
+				} else {
+					this._li.setAttribute('hidden', newVal);
+				}
+				break;
+			}
+		}
 		const parent = this.parentNode;
 		if (!(parent instanceof SelectList)) { return; }
-		parent.update(this);
+		const li = this._li;
+		parent._updateShow(li);
+		parent._updateSelect(li);
 	}
 }
