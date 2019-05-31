@@ -59,6 +59,7 @@ export default class ImageSize extends HTMLElement {
 	#show-plyer { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); }
 	#show-plyer img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: auto; max-height: 80%; max-width: 80%; }
 	button { border: 1px solid; }
+	canvas { opacity: 0; pointer-events: none; }
 	${generateThemeStyle(':host')}
 	${generateThemeStyle('button', 'button')}
 	${generateThemeStyle('input', 'input')}
@@ -207,7 +208,7 @@ export default class ImageSize extends HTMLElement {
 	get height() { return Number(this._height.value); }
 	get zoom() { return Number(this._zoom.value); }
 	async getUrl(image) {
-		const canvas = document.createElement("canvas");
+		const canvas = this.shadowRoot.appendChild(document.createElement("canvas"));
 		let w, h;
 		switch(Math.floor(this.mode % 4)) {
 			default:
@@ -230,7 +231,10 @@ export default class ImageSize extends HTMLElement {
 		canvas.width = w;
 		canvas.height = h;
 		canvas.getContext("2d").drawImage(image, 0, 0, w, h);
-		return new Promise (resolve => canvas.toBlob(blob => resolve(URL.createObjectURL(blob)), this.mime));
+		return new Promise (resolve => canvas.toBlob(blob => {
+			canvas.remove();
+			resolve(URL.createObjectURL(blob));
+		}, this.mime));
 	}
 	show (url) {
 		const showPlyer = this._showPlyer;
