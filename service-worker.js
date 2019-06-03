@@ -99,11 +99,11 @@ self.addEventListener('fetch', function(event) {
 	if (pageId && pageId[pageId.length - 1] === '/') {
 		return event.respondWith(Promise.resolve(new Response('',{ status: 301, headers: { location: pageId, } })));
 	} else if (pageId === 'pwa') {
-		return event.respondWith(caches.match('./pwa/').then(res => res || backup('./pwa/index.html')));
+		return event.respondWith(caches.match('./pwa/index.html').then(res => res || backup('./pwa/index.html')));
 	} else if (pageId === 'xutool') {
-		return event.respondWith(caches.match('./xutool/').then(res => res || backup('./xutool/index.html')));
+		return event.respondWith(caches.match('./xutool/index.html').then(res => res || backup('./xutool/index.html')));
 	} else if (pageId) {
-		return event.respondWith(caches.match('./index/').then(res => res || backup('./index/index.html')));
+		return event.respondWith(caches.match('./index/index.html').then(res => res || backup('./index/index.html')));
 	}
 	const itemId = getItemId(path);
 	if (itemId === 'index.json') {
