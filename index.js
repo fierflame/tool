@@ -167,12 +167,12 @@ export default class Index extends HTMLElement {
 				${generateThemeStyle('a', 'itemExplain', 'p')}
 			</style>
 			<ul id="home-index">
-				${list.map(({id, title, explain}) => `<li><a href="${path}${id}/" title="${title}" id="${id}"><h2>${title}</h2><p>${explain}</p></a></li>`).join('')}
+				${list.map(({id, name, description}) => `<li><a href="${path}${id}/" title="${name}" id="${id}"><h2>${name}</h2><p>${description}</p></a></li>`).join('')}
 			</ul>`
 		Array.from(shadow.querySelectorAll('a')).forEach(a => {
-			const {id, title} = a;
+			const {id, name} = a;
 			a.addEventListener('click', event => {
-				gotoTool(id, title);
+				gotoTool(id, name);
 				event.preventDefault();
 				event.stopPropagation();	
 			});
