@@ -1,3 +1,8 @@
+/**
+ * @name 文件转换 Base64
+ * @description 可以将文件转为 Base64 编码
+ */
+
 import {generateThemeStyle} from '../index.js';
 
 export default class Base64 extends HTMLElement {

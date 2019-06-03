@@ -1,3 +1,8 @@
+/**
+ * @name Qrcode 二维码生成器
+ * @description 可以生成文本、网址等的二维码
+ */
+
 import {generateThemeStyle} from '../index.js';
 import createQrcodeMap from '../util/qrcode.js'
 

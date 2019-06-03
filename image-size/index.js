@@ -1,3 +1,8 @@
+/**
+ * @name 图片尺寸修改
+ * @description 可以修改图片尺寸为合适大小
+ */
+
 import {generateThemeStyle} from '../index.js';
 
 function getSize(size) {

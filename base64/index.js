@@ -1,3 +1,8 @@
+/**
+ * @name Base64 编码转换
+ * @description 可以进行 base64 编码或解码
+ */
+
 import {generateThemeStyle} from '../index.js';
 import * as base64 from '../util/base64.js'
 
