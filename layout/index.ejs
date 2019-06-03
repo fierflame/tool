@@ -2,33 +2,33 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title><%= title ? `${title} | ` : '' %>开发者工具 @ 王晨旭的网站</title>
+	<title><%= page.title ? `${page.title} | ` : '' %>开发者工具 @ 王晨旭的网站</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<link rel="manifest" href="<%=isIndex ? './' : '../'%>manifest.json">
-	<link rel="stylesheet" href="<%=isIndex ? './' : '../'%>index.css">
-	<script type="module" src="<%=isIndex ? './' : '../'%>index.js"></script>
+	<link rel="manifest" href="<%=page.isIndex ? './' : '../'%>manifest.json">
+	<link rel="stylesheet" href="<%=page.isIndex ? './' : '../'%>index.css">
+	<script type="module" src="<%=page.isIndex ? './' : '../'%>index.js"></script>
 	<meta name="theme-color" content="#08F">
 	<meta name="renderer" content="webkit"/>
 	<meta name="force-rendering" content="webkit"/>
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
-	<%if(isInit || isPWA || isTool) {%><meta name="robots" content="noindex"><%}%>
-	<%if(isPWA || isTool) {%><style>main{max-width: none;}</style><%}%>
+	<%if(page.isInit || page.isPWA || page.isTool) {%><meta name="robots" content="noindex"><%}%>
+	<%if(page.isPWA || page.isTool) {%><style>main{max-width: none;}</style><%}%>
 </head>
 <body>
-	<%if(!isPWA && !isTool){%><header>
+	<%if(!page.isPWA && !page.isTool){%><header>
 		<div>
-			<a href="<%=isIndex ? './' : '../'%>" id="site-logo"><img src="<%=isIndex ? './' : '../'%>logo/logo.svg">开发者工具</a>
+			<a href="<%=page.isIndex ? './' : '../'%>" id="site-logo"><img src="<%=page.isIndex ? './' : '../'%>logo/logo.svg">开发者工具</a>
 			<nav><a target="_blank" href="http://www.wangchenxu.net/">博客</a></nav>
 		</div>
 	</header><%}%>
 	<main id="main">
-		<%if(!isTool){%><div id="tool-bar">
-			<%if(!isPWA){%><a class="btn" href="#main">#</a><%}%>
-			<a class="btn" href="<%=isIndex ? './' : '../'%>" data-xu-tool-id="index">首页</a>
-			<div id="title"><%= title || '开发者工具' %></div>
+		<%if(!page.isTool){%><div id="tool-bar">
+			<%if(!page.isPWA){%><a class="btn" href="#main">#</a><%}%>
+			<a class="btn" href="<%=page.isIndex ? './' : '../'%>" data-xu-tool-id="index">首页</a>
+			<div id="title"><%= page.title || '开发者工具' %></div>
 		</div><%}%>
-		<%if (isIndex) {%><ul class="main" id="home-index"><%for (let it of list) {%>
-				<li><a href="./<%=it.id%>/" data-xu-tool-id="<%=it.id%>" title="<%=it.title%>"><h2><%=it.title%></h2><p><%=it.explain%></p></a></li>
+		<%if (page.isIndex) {%><ul class="main" id="home-index"><%for (let it of page.list) {%>
+				<li><a href="./<%=it.id%>/" data-xu-tool-id="<%=it.id%>" title="<%=it.name%>"><h2><%=it.name%></h2><p><%=it.description%></p></a></li>
 		<%}%></ul><%} else {%><xutool-xutool class="main">
 			<div class="loadding-box">
 				<div class="loadding"></div>
@@ -37,19 +37,19 @@
 				<p>请升级浏览器后再试</p>
 			</div>
 		</xutool-xutool><%}%>
-		<%if(isPWA){%><div class="xutool-copyright">
+		<%if(page.isPWA){%><div class="xutool-copyright">
 			<a href="http://www.beian.miit.gov.cn" target="_blank">鲁ICP备16012041号</a>
 			&copy;2018- 2019
 			<a href="http://www.wangchenxu.net" target="_blank">王晨旭的网站</a>
 			<script src="//s19.cnzz.com/stat.php?id=1274150741&show=pic"></script>
 		</div><%}%>
-		<%if(isTool){%><div class="xutool-copyright">
+		<%if(page.isTool){%><div class="xutool-copyright">
 			此功能由<a target="_blank" href="http://tool.wangchenxu.net/">开发者工具</a>提供
 			&copy;2018- 2019
 			<script src="//s19.cnzz.com/stat.php?id=1274150741&show=pic"></script>
 		</div><%}%>
 	</main>
-	<%if(!isPWA && !isTool){%><footer>
+	<%if(!page.isPWA && !page.isTool){%><footer>
 		<div>
 			<a href="http://www.beian.miit.gov.cn" target="_blank">鲁ICP备16012041号</a>
 			&copy;2018- 2019
