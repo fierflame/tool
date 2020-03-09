@@ -2,7 +2,7 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title><%= page.title ? `${page.title} | ` : '' %>开发者工具 @ 王晨旭的网站</title>
+	<title><%= page.title ? `${page.title} | ` : '' %>Tools @ Fierflame.com</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<link rel="manifest" href="<%=page.isIndex ? './' : '../'%>manifest.json">
 	<link rel="stylesheet" href="<%=page.isIndex ? './' : '../'%>index.css">
@@ -18,7 +18,7 @@
 	<%if(!page.isPWA && !page.isTool){%><header>
 		<div>
 			<a href="<%=page.isIndex ? './' : '../'%>" id="site-logo"><img src="<%=page.isIndex ? './' : '../'%>logo/logo.svg">开发者工具</a>
-			<nav><a target="_blank" href="http://www.wangchenxu.net/">博客</a></nav>
+			<nav><a target="_blank" href="http://www.fierflame.com/">博客</a></nav>
 		</div>
 	</header><%}%>
 	<main id="main">
@@ -38,22 +38,23 @@
 			</div>
 		</xutool-xutool><%}%>
 		<%if(page.isPWA){%><div class="xutool-copyright">
-			<a href="http://www.beian.miit.gov.cn" target="_blank">鲁ICP备16012041号</a>
-			&copy;2018- 2019
-			<a href="http://www.wangchenxu.net" target="_blank">王晨旭的网站</a>
+			<!-- <a href="http://www.beian.miit.gov.cn" target="_blank">鲁ICP备16012041号</a> -->
+			&copy;2018- <%= new Date().getFullYear(); %>
+			<a href="http://www.fierflame.com" target="_blank">Fierflame</a>
 			<script src="//s19.cnzz.com/stat.php?id=1274150741&show=pic"></script>
 		</div><%}%>
 		<%if(page.isTool){%><div class="xutool-copyright">
-			此功能由<a target="_blank" href="http://tool.wangchenxu.net/">开发者工具</a>提供
-			&copy;2018- 2019
+			此功能由<a target="_blank" href="http://tool.fierflame.com/">Fierflame.com</a>提供
+			<!-- <a href="http://www.beian.miit.gov.cn" target="_blank">鲁ICP备16012041号</a> -->
+			&copy;2018- <%= new Date().getFullYear(); %>
 			<script src="//s19.cnzz.com/stat.php?id=1274150741&show=pic"></script>
 		</div><%}%>
 	</main>
 	<%if(!page.isPWA && !page.isTool){%><footer>
 		<div>
-			<a href="http://www.beian.miit.gov.cn" target="_blank">鲁ICP备16012041号</a>
-			&copy;2018- 2019
-			<a href="http://www.wangchenxu.net" target="_blank">王晨旭的网站</a>
+			<!-- <a href="http://www.beian.miit.gov.cn" target="_blank">鲁ICP备16012041号</a> -->
+			&copy;2018- <%= new Date().getFullYear(); %>
+			<a href="http://www.fierflame.com" target="_blank">Fierflame</a>
 			<script src="//s19.cnzz.com/stat.php?id=1274150741&show=pic"></script>
 		</div>
 	</footer><%}%>

@@ -19,7 +19,7 @@ const baseItem = [
 baseItem.forEach(it => itemVersion[it] = baseItemVersion);
 
 
-const cacheName = 'tools@wangchenxu.net';
+const cacheName = 'tool@fierflame.com';
 const serviceRoot = self.location.href.replace(/\/*([^/]*)(?:[#?].*)?$/, '/');
 function getPath(url) {
 	if (url.indexOf(serviceRoot) !== 0) { return; }
